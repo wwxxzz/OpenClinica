@@ -3,13 +3,6 @@ pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
 pom.xml.next
-<<<<<<< HEAD
-release.properties
-.classpath
-.project
-.settings/
-web/src/main/resources/datainfo.properties
-=======
 pom.xml
 
 .classpath
@@ -21,27 +14,16 @@ web/src/main/resources/datainfo.properties
 web/src/main/filters/datainfo.properties
 
 #Store
->>>>>>> d4c503302eb9baaaef5051f3f350c332a6963f55
 .DS_Store
 core/.DS_Store
 web/.DS_Store
 ws/.DS_Store
 
-<<<<<<< HEAD
-=======
 #
 
->>>>>>> d4c503302eb9baaaef5051f3f350c332a6963f55
 # intellij idea
 .idea/
 *.iml
 
 # git
-<<<<<<< HEAD
 *.orig
-
-# netbeans
-nb-configuration.xml
-=======
-*.orig
->>>>>>> d4c503302eb9baaaef5051f3f350c332a6963f55
