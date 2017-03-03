@@ -297,19 +297,4 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
         this.crfLocker = crfLocker;
     }
 
-	public void setAllowSessionCreation(Object arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setAuthenticationFailureHandler(Object arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	//public void setAllowSessionCreation(Object arg0) {
-		// TODO Auto-generated method stub
-		
-	//}
-
 }

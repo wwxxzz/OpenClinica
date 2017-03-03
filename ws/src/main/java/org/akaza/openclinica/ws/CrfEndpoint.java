@@ -23,7 +23,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.io.FileOutputStream;
-import java.net.CacheResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -77,7 +76,7 @@ public class CrfEndpoint {
         } catch (Exception e) {
             // TODO: handle exception
         }
-        CreateCrfResponse crfResponse=new CacheResponse();
+        CreateCrfResponse crfResponse = new CreateCrfResponse();
         crfResponse.setResult(SUCCESS_MESSAGE);
         crfResponse.setKey("test");
         return crfResponse;

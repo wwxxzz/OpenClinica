@@ -4,9 +4,6 @@
          xmlns="http://java.sun.com/xml/ns/j2ee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
-
-    <!--http://www.springmodules.org/schema/cache/springmodules-cache.xsd http://www.springmodules.org/schema/cache/springmodules-ehcache.xsd"-->
-
     <display-name>OpenClinica</display-name>
     <description>
         OpenClinica web interface
@@ -44,7 +41,7 @@
     <!--caiye add-->
     <context-param>
         <param-name>webAppRootKey</param-name>
-        <param-value>myopenclinicabest.root1</param-value>
+        <param-value>myopenclinica.root1</param-value>
     </context-param>
 
     <listener>
@@ -250,8 +247,8 @@
     </servlet>
     <servlet>
         <servlet-name>ChooseDownloadFormat</servlet-name>
-        <servlet-class>org.akaza.openclinica.control.extract.ChooseDownloadFormat</servlet-class>
         <description>ChooseDownloadFormat</description>
+        <servlet-class>org.akaza.openclinica.control.extract.ChooseDownloadFormat</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ViewLogMessage</servlet-name>
