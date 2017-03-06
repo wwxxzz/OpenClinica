@@ -11,10 +11,10 @@ import org.springframework.util.Assert;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
-import java.util.TreeMap;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.TreeMap;
+
 
 /**
  * Controller for retrieving the model for and displaying the confirmation page for access to a protected resource.
