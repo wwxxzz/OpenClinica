@@ -1,5 +1,6 @@
 package org.akaza.openclinica.dao.core;
 
+import java.io.*;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,7 +13,6 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
-
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import org.akaza.openclinica.bean.service.SasProcessingFunction;
