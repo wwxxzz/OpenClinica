@@ -13,7 +13,6 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
@@ -21,7 +20,6 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.ListCRFRow;
-import org.akaza.openclinica.web.pform.EnketoAPI;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -59,8 +57,8 @@ public class ListCRFServlet extends SecureController {
         if (ub.isSysAdmin() || ub.isTechAdmin()) {
             return;
         }
-
-        if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
+        //clover-add(readonly)
+        if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR) || currentRole.getRole().equals(Role.READYONLY)) {
             return;
         }
 
@@ -93,7 +91,7 @@ public class ListCRFServlet extends SecureController {
             return;
         }
         request.setAttribute(MODULE, module);
-        
+
         // if coming from change crf version -> display message
         String crfVersionChangeMsg = fp.getString("isFromCRFVersionBatchChange");
         if (crfVersionChangeMsg != null && !crfVersionChangeMsg.equals("")) {
@@ -108,7 +106,19 @@ public class ListCRFServlet extends SecureController {
 
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
         CRFVersionDAO vdao = new CRFVersionDAO(sm.getDataSource());
-        ArrayList crfs = (ArrayList) cdao.findAll();
+        //ArrayList crfs = (ArrayList) cdao.findAll();
+        //clover-add:choise crfs by ubId
+        ArrayList crfs = null;
+        if (ub.isSysAdmin()){
+            crfs = (ArrayList) cdao.findAll();
+        } else {
+            Role rr = ub.getRoleByStudy(currentStudy.getId()).getRole();
+            if (rr.equals(Role.READYONLY)) {
+                crfs = (ArrayList) cdao.findAllByStudy(ub.getOwner().getActiveStudyId());
+            }else {
+                crfs = (ArrayList) cdao.findByubId(ub.getId());
+            }
+        }
         for (int i = 0; i < crfs.size(); i++) {
             CRFBean eb = (CRFBean) crfs.get(i);
             logger.debug("crf id:" + eb.getId());

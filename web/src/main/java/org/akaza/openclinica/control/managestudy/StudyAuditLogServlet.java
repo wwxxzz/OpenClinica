@@ -99,7 +99,8 @@ public class StudyAuditLogServlet extends SecureController {
         }
 
         Role r = currentRole.getRole();
-        if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.MONITOR)) {
+        //clover-add(readonly)
+        if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.MONITOR)|| r.equals(Role.READYONLY)) {
             return;
         }
 

@@ -39,8 +39,8 @@ public class ListStudyUserServlet extends SecureController {
         if (ub.isSysAdmin()) {
             return;
         }
-
-        if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
+        //clover-add(readonly)
+        if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR) || currentRole.getRole().equals(Role.READYONLY)) {
             return;
         }
 
@@ -64,7 +64,10 @@ public class ListStudyUserServlet extends SecureController {
         table.setColumns(new ArrayList(Arrays.asList(columns)));
         table.hideColumnLink(6);
         table.setQuery("ListStudyUser", new HashMap());
-        table.addLink(restext.getString("assign_new_user_to_current_study"), "AssignUserToStudy");
+        //clover-add(readonly)
+        if(!currentRole.isReadonly()) {
+            table.addLink(restext.getString("assign_new_user_to_current_study"), "AssignUserToStudy");
+        }
         table.setRows(allStudyUserRows);
         table.computeDisplay();
 

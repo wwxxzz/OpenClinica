@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="OpenClinica-web:war">
+    <output-path>$PROJECT_DIR$/web/target</output-path>
+    <root id="archive" name="OpenClinica-web-3.12.2.war">
+      <element id="artifact" artifact-name="OpenClinica-web:war exploded" />
+    </root>
+  </artifact>
+</component>

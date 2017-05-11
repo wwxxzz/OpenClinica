@@ -36,6 +36,11 @@
 		<name>findAll</name>
 		<sql>SELECT * FROM CRF</sql>
 	</query>
+	<!--clover-add(findByubId)-->
+	<query>
+		<name>findByubId</name>
+		<sql>SELECT * FROM CRF WHERE owner_id=?</sql>
+	</query>
 	<query>
 		<name>findAllByStudy</name>
 		<sql>SELECT * FROM CRF WHERE source_study_id=?</sql>

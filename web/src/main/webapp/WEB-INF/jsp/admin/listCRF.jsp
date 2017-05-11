@@ -7,69 +7,93 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
-<c:choose>
-<c:when test="${userBean.sysAdmin && module=='admin'}">
- <c:import url="../include/admin-header.jsp"/>
-</c:when>
-<c:otherwise>
- <c:import url="../include/managestudy-header.jsp"/>
-</c:otherwise>
-</c:choose>
-
-
-<!-- move the alert message to the sidebar-->
-<jsp:include page="../include/sideAlert.jsp"/>
-<!-- then instructions-->
-<tr id="sidebar_Instructions_open" style="display: all">
-		<td class="sidebar_tab">
-
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
-
-		<b><fmt:message key="instructions" bundle="${restext}"/></b>
-
-		<div class="sidebar_tab_content">
-        <fmt:message key="CRF_library_shows_all_CRFs" bundle="${restext}"/>
-
-		</div>
-
-		</td>
-
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: none">
-		<td class="sidebar_tab">
-
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
-
-		<b><fmt:message key="instructions" bundle="${restext}"/></b>
-
-		</td>
-  </tr>
-<jsp:include page="../include/sideInfo.jsp"/>
-
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
-<c:choose>
-<c:when test="${userBean.sysAdmin && module=='admin'}">
-	<h1><span class="title_manage"><fmt:message key="administer_CRFs2" bundle="${resworkflow}"/>
-        <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/administer-crfs-crf-template#content-title-2991')">
-            <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
-</span></h1>
-</c:when>
-<c:otherwise>
-	<h1><span class="title_manage"><fmt:message key="manage_CRFs2" bundle="${resworkflow}"/>
-        <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data/manage-crf')">
-		<img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
-</span></h1>
-</c:otherwise>
-</c:choose>
 
-<!-- <p><fmt:message key="can_download_blank_CRF_excel" bundle="${restext}"/> <a href="DownloadVersionSpreadSheet?template=1"><b><fmt:message key="here" bundle="${resword}"/></b></a>.</p> -->
 <%--
-<p><fmt:message key="also_download_set_example_CRFs" bundle="${restext}"/> <a href="http://www.openclinica.org/entities/entity_details.php?eid=151" target="_blank"><fmt:message key="here" bundle="${resword}"/></a>.</p>
+    该页面为管理CRF页面/ListCRF,分为admin和manage权限,权限不同时显示的不同
+    include admin-header.jsp\managestudy-header.jsp\sideAlert.jsp\showTable.jsp\showStudyRow.jsp\footer.jsp
+    FY 2017-4-8
 --%>
 
-<c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showCRFRow.jsp" /></c:import>
+<!--两种header-->
+<c:choose>
+    <c:when test="${userBean.sysAdmin && module=='admin'}">
+        <c:import url="../include/admin-header.jsp"/>
+    </c:when>
+    <c:otherwise>
+        <c:import url="../include/managestudy-header.jsp"/>
+    </c:otherwise>
+</c:choose>
+<!--end of 两种header-->
 
+<%--侧栏和主内容区--%>
+<div class="row clearfix">
+    <%--侧栏--%>
+    <div class="col-lg-2 column">
 
+        <!--sideAlert-->
+        <jsp:include page="../include/sideAlert.jsp"/>
+        <!--end of sideAlert-->
+
+        <%--instructions--%>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" href="#collapseins">
+                        <fmt:message key="instructions" bundle="${resword}"/>
+                        <span class="glyphicon glyphicon-pushpin pull-right"></span>
+                    </a>
+                </h4>
+            </div>
+            <div id="collapseins" class="panel-collapse collapse in">
+                <div class="panel-body">
+                    <fmt:message key="CRF_library_shows_all_CRFs" bundle="${restext}"/>
+                </div>
+            </div>
+        </div>
+        <%--end of instructions--%>
+
+        <!--sideInfo暂时禁用-->
+        <%--<jsp:include page="../include/sideInfo.jsp"/>--%>
+        <!--end of sideInfo-->
+
+    </div>
+    <%--end of 侧栏--%>
+
+    <%--主内容区--%>
+    <div class="col-lg-10 column">
+
+        <%--start of jumbotron--%>
+        <div class="jumbotron">
+            <%--主标题--%>
+            <h2 class="text-center">
+                <c:choose>
+                    <c:when test="${userBean.sysAdmin && module=='admin'}">
+                        <fmt:message key="administer_CRFs2" bundle="${resworkflow}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <fmt:message key="manage_CRFs2" bundle="${resworkflow}"/>
+                    </c:otherwise>
+                </c:choose>
+            </h2>
+            <%--end of 主标题--%>
+        </div>
+        <%--end of jumbotron--%>
+
+        <%--start of 主体内容--%>
+        <c:import url="../include/showTable.jsp">
+            <c:param name="rowURL" value="showCRFRow.jsp" />
+        </c:import>
+        <%--end of 主体内容--%>
+
+    </div>
+    <%--end of 主内容区--%>
+</div>
+<%--end of 侧栏与主内容区--%>
+
+<!--footer.jsp-->
 <jsp:include page="../include/footer.jsp"/>
+<!--end of footer.jsp-->
+

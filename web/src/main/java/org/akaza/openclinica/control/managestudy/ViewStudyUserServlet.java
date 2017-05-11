@@ -34,8 +34,8 @@ public class ViewStudyUserServlet extends SecureController {
         if (ub.isSysAdmin()) {
             return;
         }
-
-        if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
+        //clover-add(readonly)
+        if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR) || currentRole.getRole().equals(Role.READYONLY)) {
             return;
         }
 

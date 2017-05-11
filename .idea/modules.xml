@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/OpenClinica.iml" filepath="$PROJECT_DIR$/OpenClinica.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/OpenClinica-core.iml" filepath="$PROJECT_DIR$/core/OpenClinica-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/web/OpenClinica-web.iml" filepath="$PROJECT_DIR$/web/OpenClinica-web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ws/OpenClinica-ws.iml" filepath="$PROJECT_DIR$/ws/OpenClinica-ws.iml" />
+    </modules>
+  </component>
+</project>

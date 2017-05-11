@@ -5,28 +5,14 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
-import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.ListStudyView;
-import org.akaza.openclinica.core.SessionManager;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.FindSubjectsFilter;
-import org.akaza.openclinica.dao.managestudy.FindSubjectsSort;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
@@ -38,38 +24,18 @@ import org.apache.commons.lang.StringUtils;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
-import org.jmesa.limit.Filter;
-import org.jmesa.limit.FilterSet;
-import org.jmesa.limit.Limit;
-import org.jmesa.limit.Sort;
-import org.jmesa.limit.SortSet;
+import org.jmesa.limit.*;
 import org.jmesa.view.component.Row;
 import org.jmesa.view.editor.BasicCellEditor;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Properties;
-import java.lang.Exception;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
@@ -204,9 +170,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     @Override
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
         Role r = currentRole.getRole();
-        boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.MONITOR);
-
-        tableFacade.setToolbar(new ListStudySubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(), addSubjectLinkShow, showMoreLink));
+        boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && (!r.equals(Role.MONITOR) & !r.equals(Role.READYONLY));
+        //clover-add(download url)
+        String studySubjecOid = (studyBean.getIdentifier());
+        tableFacade.setToolbar(new ListStudySubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(), addSubjectLinkShow, showMoreLink, studySubjecOid));
+        //pre:tableFacade.setToolbar(new ListStudySubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(), addSubjectLinkShow, showMoreLink));
     }
 
     @Override
@@ -753,7 +721,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                 StringBuilder url = new StringBuilder();
 
                 url.append(viewStudySubjectLinkBuilder(studySubjectBean));
-                if (getCurrentRole().getRole() != Role.MONITOR) {
+                //clover-add(readnoly)
+                url.append(printStudySubjectLinkBuilder(studySubjectBean));
+                if (getCurrentRole().getRole() != Role.MONITOR & getCurrentRole().getRole() != Role.READYONLY) {
                     if (getStudyBean().getStatus() == Status.AVAILABLE
                             && !(studySubjectBean.getStatus() == Status.DELETED || studySubjectBean.getStatus() == Status.AUTO_DELETED)
                             && getCurrentRole().getRole() != Role.RESEARCHASSISTANT && getCurrentRole().getRole() != Role.RESEARCHASSISTANT2) {
@@ -835,6 +805,23 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         return actionLink.toString();
 
     }
+
+    //clover-add
+    //#############################
+    private String printStudySubjectLinkBuilder(StudySubjectBean studySubject) {
+        //StudyBean study = (StudyBean) studyDAO.findByPK(studySubject.getStudyId());
+        String enrolledAt = ((StudyBean) getStudyDAO().findByPK(studySubject.getStudyId())).getIdentifier();
+        HtmlBuilder actionLink = new HtmlBuilder();
+        actionLink.a().href("rest/clinicaldata/html/print/S_"+enrolledAt+"/"+studySubject.getOid()+"/all");
+        actionLink.append("onMouseDown=\"javascript:setImage('bt_Print1','images/bt_Print.gif');\"");
+        actionLink.append("onMouseUp=\"javascript:setImage('bt_Print1','images/bt_Print.gif');\"").close();
+        actionLink.img().name("bt_Print1").src("images/bt_Print.gif").border("0").alt(resword.getString("view")).title(resword.getString("view"))
+                .append("hspace=\"2\"").end().aEnd();
+        actionLink.append("&nbsp;&nbsp;&nbsp;");
+        return actionLink.toString();
+
+    }
+    //################################
 
     private String viewParticipateBuilder(StudySubjectBean studySubject) throws Exception {
         participantPortalRegistrar = new ParticipantPortalRegistrar();
@@ -1206,8 +1193,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").width("100%").close();
 
         if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED) {
-
-            if (eventStatus == SubjectEventStatus.NOT_SCHEDULED && currentRole.getRole() != Role.MONITOR && !studyBean.getStatus().isFrozen()) {
+            //clover-add(readonly,userRole.investigator)
+            if (eventStatus == SubjectEventStatus.NOT_SCHEDULED && (currentRole.getRole() != Role.MONITOR & currentRole.getRole() != Role.READYONLY & currentRole.getRole() !=Role.INVESTIGATOR) && !studyBean.getStatus().isFrozen()) {
                 eventDiv.tr(0).valign("top").close();
                 eventDiv.td(0).styleClass("table_cell_left").close();
                 createNewStudyEventLinkBuilder(eventDiv, studySubject.getId(), sed, schedule);

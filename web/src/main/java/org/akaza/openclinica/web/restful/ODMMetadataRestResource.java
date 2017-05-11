@@ -1,27 +1,29 @@
 package org.akaza.openclinica.web.restful;
 
-import java.util.Locale;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-
+import com.sun.jersey.api.view.Viewable;
+import freemarker.template.Configuration;
+import freemarker.template.ObjectWrapper;
+import freemarker.template.TemplateExceptionHandler;
+import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
 
-import com.sun.jersey.api.view.Viewable;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
-import freemarker.template.Configuration;
-import freemarker.template.ObjectWrapper;
-import freemarker.template.TemplateExceptionHandler;
 /**
  *  Rest service for ODM metadata
  *  usage ROOT_CONTEXT/rest/metadata/{format}/{mode}/{STUDYOID}
@@ -35,20 +37,23 @@ import freemarker.template.TemplateExceptionHandler;
 @Scope("prototype")
 public class ODMMetadataRestResource {
 
-	  private static final Logger LOGGER = LoggerFactory.getLogger(ODMMetadataRestResource.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ODMMetadataRestResource.class);
 
-private MetadataCollectorResource metadataCollectorResource;
+	private MetadataCollectorResource metadataCollectorResource;
 
+    //clover-add
+    public String renderString;
+    public Map <String, String> subjectOidHtml = new HashMap();
 
 	public MetadataCollectorResource getMetadataCollectorResource() {
-	return metadataCollectorResource;
-}
+		return metadataCollectorResource;
+	}
 
 
-public void setMetadataCollectorResource(
-		MetadataCollectorResource metadataCollectorResource) {
-	this.metadataCollectorResource = metadataCollectorResource;
-}
+	public void setMetadataCollectorResource(
+			MetadataCollectorResource metadataCollectorResource) {
+		this.metadataCollectorResource = metadataCollectorResource;
+	}
 
 
 	/**
@@ -94,9 +99,75 @@ public void setMetadataCollectorResource(
 		return metadataCollectorResource.collectODMMetadata(studyOID);
 	}
 
+    /**
+     * @author:clover-add
+     * @param studyOID
+     * @param jsondata
+     * @return
+     */
+    @POST
+    @Path("/createfile/all/{studyOID}")
+    public String getODMMetadata2(@PathParam("studyOID") String studyOID, @RequestBody String jsondata){
+        JSONObject json_test = JSONObject.fromObject(jsondata);
+        this.subjectOidHtml.put(json_test.getString("oid"),json_test.getString("content"));
+        //System.out.print(jsondata);
+        int count = Integer.parseInt(json_test.getString("count"));
+        System.out.print(count);
+        if (count == this.subjectOidHtml.size()){
+            return "done";
+        } else {
+           return "next";
+        }
+    }
+    /**
+     * @author:clover-add
+     * create the all subjectoid html zip for download
+     * */
+    @GET
+    @Path("/download/all/{studyOID}")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    //@Produces(MediaType.TEXT_XML)
+    public Response getODMMetadata3(@PathParam("studyOID") String studyOID){
+        //LOGGER.debug("returning here........"+studyOID);
+        //return "ODM";;
+        //return json_test.getString("content");
+        List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+        list.add(this.subjectOidHtml);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ZipOutputStream zos = new ZipOutputStream(bos);
+
+        try {
+            for (Map<String, String> m : list){
+                for (String k : m.keySet()){
+                    //System.out.println(k + " : " + m.get(k));
+                    String jsondateToHtml = m.get(k).replace("\\/","/").replace("\\\"","\"")
+                            .replace("\\n","").replace("[\"","").replace("\"]","").replace("\",\"","<br><hr><br>");
+                    zos.putNextEntry(new ZipEntry(k+".html"));
+                    zos.write(jsondateToHtml.getBytes("UTF-8"));
+                    zos.closeEntry();
+                }
+            }
+            zos.flush();
+            zos.finish();
+            this.subjectOidHtml.clear();
+			Calendar c = Calendar.getInstance();
+			String fileName = studyOID + "("+c.get(Calendar.YEAR) + "-" + c.get(Calendar.MONTH)+ "-"+c.get(Calendar.DATE)+")";
+			//this.renderString = "";
+            return Response.ok(bos.toByteArray(), "application/zip")
+                    .header("Content-Disposition", "attachment; filename="+ fileName + ".zip")
+                    .build();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                zos.close();
+            } catch (IOException e) {}
+        }
+    }
 
 
-	/**
+
+    /**
 	 * @api {get} /rest/metadata/json/view/:study/:event/:form Retrieve CDISC ODM case report form definitions - JSON
 	 * @apiVersion 3.8.0
 	 * @apiName GetODMJSON
@@ -173,36 +244,69 @@ public void setMetadataCollectorResource(
 	 *       "error": "NoAccessRight"
 	 *     }
 	 */
-  @GET
-  @Path("/html/print/{studyOID}/{eventOID}/{formVersionOID}")
-  public Viewable getPrintCRFController(
-    @Context HttpServletRequest request,
-    @Context HttpServletResponse response,
-    @PathParam("studyOID") String studyOID,
-    @PathParam("eventOID") String eventOID,
-    @PathParam("formVersionOID") String formVersionOID
+	@GET
+	@Path("/html/print/{studyOID}/{eventOID}/{formVersionOID}")
+	public Viewable getPrintCRFController(
+			@Context HttpServletRequest request,
+			@Context HttpServletResponse response,
+			@PathParam("studyOID") String studyOID,
+			@PathParam("eventOID") String eventOID,
+			@PathParam("formVersionOID") String formVersionOID
+	) throws Exception {
+		request.setAttribute("studyOID", studyOID);
+		request.setAttribute("eventOID", eventOID);
+		request.setAttribute("formVersionOID", formVersionOID);
+		return new Viewable("/WEB-INF/jsp/printcrf.jsp", null);
+	}
+
+	/**return empty crf
+	 * clover-add(1)
+	 * @param studyOID
+	 * @return
+	 */
+	@GET
+	@Path("/html/print/{studyOID}")
+	public Viewable getPrintEmptyCRFController(
+			@Context HttpServletRequest request,
+			@Context HttpServletResponse response,
+			@PathParam("studyOID") String studyOID
+	) throws Exception {
+		request.setAttribute("studyOID", studyOID);
+		return new Viewable("/WEB-INF/jsp/printcrf.jsp", null);
+	}
+
+    /**return annotated crf
+     * clover-add(1)
+     * @param studyOID
+     * @return
+     */
+    @GET
+    @Path("/html/print/{studyOID}/annotation")
+    public Viewable getPrintAnnotatedCRFController(
+            @Context HttpServletRequest request,
+            @Context HttpServletResponse response,
+            @PathParam("studyOID") String studyOID
     ) throws Exception {
-      request.setAttribute("studyOID", studyOID);
-      request.setAttribute("eventOID", eventOID);
-      request.setAttribute("formVersionOID", formVersionOID);
-      return new Viewable("/WEB-INF/jsp/printcrf.jsp", null);
-  }
+        request.setAttribute("studyOID", studyOID);
+        request.setAttribute("annotated", "y");
+        return new Viewable("/WEB-INF/jsp/printcrf.jsp", null);
+    }
 
 
-//  @GET
- // @Path("/pdf/print/{studyOID}/{eventOID}/{formVersionOID}")
-  //JN: Commenting out this part of pdf generation written by Nick as the approach might be different. Look for these files in mercurial repo for history.
- /*	public javax.ws.rs.core.Response getPdf(@PathParam("studyOID") String studyOID,@PathParam("formVersionOID") String formVersionOID,
+  	//@GET
+	//@Path("/pdf/print/{studyOID}/{eventOID}/{formVersionOID}")
+	//JN: Commenting out this part of pdf generation written by Nick as the approach might be different. Look for these files in mercurial repo for history.
+ 	/*public javax.ws.rs.core.Response getPdf(@PathParam("studyOID") String studyOID,@PathParam("formVersionOID") String formVersionOID,
  	    @PathParam("eventOID") String eventOID, @Context HttpServletRequest request, @Context HttpServletResponse response ) {
       JSON json = metadataCollectorResource.collectODMMetadataJson(studyOID,formVersionOID);
       try {
-		getPrintServer(request, response, json, studyOID, eventOID, formVersionOID);
+		//getPrintServer(request, response, json, studyOID, eventOID, formVersionOID);
 	} catch (Exception e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
     return javax.ws.rs.core.Response.ok().type("application/pdf").build();
- }*/
+ }
 
  /*
    @GET
@@ -223,8 +327,7 @@ public void setMetadataCollectorResource(
  	}
  	*/
 
-
-  @GET
+	@GET
 	@Path("/xml/view/{studyOID}/{studyEventDefinitionOId}/{formVersionOID}")
 	@Produces(MediaType.TEXT_XML)
 	public String getODMMetadataWithFormVersionOID(@PathParam("studyOID") String studyOID,@PathParam("formVersionOID") String formVersionOID ){
@@ -233,41 +336,40 @@ public void setMetadataCollectorResource(
 	}
 
 
-    @GET
- 	@Path("/json/view/{studyOID}/{studyEventDefinitionOId}/{formVersionOID}")
- 	@Produces(MediaType.APPLICATION_JSON)
- 	public String getODMMetadataJson(@PathParam("studyOID") String studyOID,@PathParam("formVersionOID") String formVersionOID ){
- 		LOGGER.debug("returning here........"+formVersionOID);
-    	return metadataCollectorResource.collectODMMetadataJsonString(studyOID,formVersionOID);
- 	}
-
+	@GET
+	@Path("/json/view/{studyOID}/{studyEventDefinitionOId}/{formVersionOID}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getODMMetadataJson(@PathParam("studyOID") String studyOID,@PathParam("formVersionOID") String formVersionOID ){
+		LOGGER.debug("returning here........"+formVersionOID);
+		return metadataCollectorResource.collectODMMetadataJsonString(studyOID,formVersionOID);
+	}
 
  /**/
 
-  private Configuration initFreemarker(ServletContext context) {
-    // Initialize the FreeMarker configuration;
-    // - Create a configuration instance
-    Configuration cfg = new freemarker.template.Configuration();
-    // - Templates are stoted in the WEB-INF/templates directory of the Web app.
-    cfg.setServletContextForTemplateLoading(context, "WEB-INF/template");
-    // - Set update dealy to 0 for now, to ease debugging and testing.
-    //   Higher value should be used in production environment.
-    cfg.setTemplateUpdateDelay(0);
-    // - Set an error handler that prints errors so they are readable with
-    //   a HTML browser.
-    cfg.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
-    // - Use beans wrapper (recommmended for most applications)
-    cfg.setObjectWrapper(ObjectWrapper.BEANS_WRAPPER);
-    // - Set the default charset of the template files
-    cfg.setDefaultEncoding("ISO-8859-1");
-    // - Set the charset of the output. This is actually just a hint, that
-    //   templates may require for URL encoding and for generating META element
-    //   that uses http-equiv="Content-type".
-    cfg.setOutputEncoding("UTF-8");
-    // - Set the default locale
-    cfg.setLocale(Locale.US);
+	private Configuration initFreemarker(ServletContext context) {
+		// Initialize the FreeMarker configuration;
+		// - Create a configuration instance
+		Configuration cfg = new freemarker.template.Configuration();
+		// - Templates are stoted in the WEB-INF/templates directory of the Web app.
+		cfg.setServletContextForTemplateLoading(context, "WEB-INF/template");
+		// - Set update dealy to 0 for now, to ease debugging and testing.
+		//   Higher value should be used in production environment.
+		cfg.setTemplateUpdateDelay(0);
+		// - Set an error handler that prints errors so they are readable with
+		//   a HTML browser.
+		cfg.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
+		// - Use beans wrapper (recommmended for most applications)
+		cfg.setObjectWrapper(ObjectWrapper.BEANS_WRAPPER);
+		// - Set the default charset of the template files
+		cfg.setDefaultEncoding("ISO-8859-1");
+		// - Set the charset of the output. This is actually just a hint, that
+		//   templates may require for URL encoding and for generating META element
+		//   that uses http-equiv="Content-type".
+		cfg.setOutputEncoding("UTF-8");
+		// - Set the default locale
+		cfg.setLocale(Locale.US);
 
-    return cfg;
-  }
+		return cfg;
+	}
 
 }

@@ -1,24 +1,20 @@
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.jmesa.view.html.HtmlBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 
 public class EventCrfLayerBuilder {
 
@@ -193,9 +189,9 @@ public class EventCrfLayerBuilder {
                 printDataEntry(html, eventCrfBean, reswords.getString("print"));
                 html.tdEnd().trEnd(0);
             }
-
+            //clover-add(readyonly)
             //if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
-            if (!currentRole.isMonitor() && currentStudy.getStatus() == Status.AVAILABLE) {
+            if (!currentRole.isMonitor() && !currentRole.isReadonly() && currentStudy.getStatus() == Status.AVAILABLE) {
                 if (! hiddenCrf()) {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();
@@ -245,7 +241,8 @@ public class EventCrfLayerBuilder {
                 html.tdEnd().trEnd(0);
             }
         } else if (eventCrfStatus == DataEntryStage.UNCOMPLETED) {
-            if (getStudyEvent() != null && !currentRole.isMonitor() && currentStudy.getStatus() == Status.AVAILABLE) {
+            //clover-add(readyonly)
+            if (getStudyEvent() != null && !currentRole.isMonitor() && !currentRole.isReadonly() && currentStudy.getStatus() == Status.AVAILABLE) {
                 if (! hiddenCrf()) {
                     html.tr(0).valign("top").close();
                     html.td(0).styleClass(table_cell_left).close();
@@ -302,7 +299,8 @@ public class EventCrfLayerBuilder {
                 html.tdEnd().trEnd(0);
             }
         } else {
-            if (!currentRole.isMonitor() && currentStudy.getStatus() == Status.AVAILABLE) {
+            //clover-add(readyonly_event)
+            if (!currentRole.isMonitor() && !currentRole.isReadonly() && !currentRole.isInvestigator() && currentStudy.getStatus() == Status.AVAILABLE) {
                 if (eventCrfStatus == DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE || eventCrfStatus == DataEntryStage.DOUBLE_DATA_ENTRY) {
                     if (! hiddenCrf()) {
                         html.tr(0).valign("top").close();

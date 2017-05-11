@@ -10,95 +10,65 @@
 <jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean' />
 <jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />
 <jsp:useBean scope='request' id='isAdminServlet' class='java.lang.String' />
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
+<%--
+    该页面为Header(LOGO+导航栏),包含html结构
+    include navBar.jsp
+    from menu.jsp
+    FY 2017-4-8
+--%>
 
-<title><fmt:message key="openclinica" bundle="${resword}"/></title>
+<!DOCTYPE html>
+    <head>
+        <c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<link rel="stylesheet" href="includes/styles.css" type="text/css"/>
-<%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
-<%-- <link rel="stylesheet" href="includes/NewNavStyles.css" type="text/css" />--%>
-<script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>
-<%-- <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript2.js"></script> --%>
-<script type="text/JavaScript" language="JavaScript" src="includes/Tabs.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/CalendarPopup.js"></script>
-<script type="text/JavaScript" language="JavaScript" src=
-  "includes/repetition-model/repetition-model.js"></script>
-  <script type="text/JavaScript" language="JavaScript" src="includes/prototype.js"></script>
-  <script type="text/JavaScript" language="JavaScript" src="includes/scriptaculous.js?load=effects"></script>
-  <script type="text/JavaScript" language="JavaScript" src="includes/effects.js"></script>
-    <!-- Added for the new Calender -->
-	
-    <link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
-    <script type="text/javascript" src="includes/new_cal/calendar.js"></script>
-     <!--  fix for issue 14427 Removed the mapping with wrong file name calendar_en.js-->
-      <script type="text/javascript" src="includes/new_cal/lang/calendar-en.js"></script>
-      <script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
-    <script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
-<!-- End -->
+        <title><fmt:message key="openclinica" bundle="${resword}"/></title>
 
-    <script language="JavaScript">
-        function reportBug() {
-            var bugtrack = "https://www.openclinica.com/OpenClinica/bug.php?version=<fmt:message key="version_number" bundle="${resword}"/>&user=";
-            var user= "<c:out value="${userBean.name}"/>";
-            bugtrack = bugtrack + user+ "&url=" + window.location.href;
-            openDocWindow(bugtrack);
-        }
-        function pageWidth() {return window.innerWidth != null? window.innerWidth: document.documentElement && document.documentElement.clientWidth ? document.documentElement.clientWidth:document.body != null? document.body.clientWidth:null;}
-        function pageHeight() {return window.innerHeight != null? window.innerHeight: document.documentElement && document.documentElement.clientHeight ? document.documentElement.clientHeight:document.body != null? document.body.clientHeight:null;}
-        function posLeft() {return typeof window.pageXOffset != 'undefined' ? window.pageXOffset:document.documentElement && document.documentElement.scrollLeft? document.documentElement.scrollLeft:document.body.scrollLeft? document.body.scrollLeft:0;}
-        function posTop() {return typeof window.pageYOffset != 'undefined' ? window.pageYOffset:document.documentElement && document.documentElement.scrollTop? document.documentElement.scrollTop: document.body.scrollTop?document.body.scrollTop:0;}
-        function $(x){return document.getElementById(x);}
-        function scrollFix(){var obol=$('ol');obol.style.top=posTop()+'px';obol.style.left=posLeft()+'px'}
-        function sizeFix(){var obol=$('ol');obol.style.height=pageHeight()+'px';obol.style.width=pageWidth()+'px';}
-        function kp(e){ky=e?e.which:event.keyCode;if(ky==88||ky==120)hm();return false}
-        function inf(h){tag=document.getElementsByTagName('select');for(i=tag.length-1;i>=0;i--)tag[i].style.visibility=h;tag=document.getElementsByTagName('iframe');for(i=tag.length-1;i>=0;i--)tag[i].style.visibility=h;tag=document.getElementsByTagName('object');for(i=tag.length-1;i>=0;i--)tag[i].style.visibility=h;}
-        function sm(obl, wd, ht){var h='hidden';var b='block';var p='px';var obol=$('ol'); var obbxd = $('mbd');obbxd.innerHTML = $(obl).innerHTML;obol.style.height=pageHeight()+p;obol.style.width=pageWidth()+p;obol.style.top=posTop()+p;obol.style.left=posLeft()+p;obol.style.display=b;var tp=posTop()+((pageHeight()-ht)/2)-12;var lt=posLeft()+((pageWidth()-wd)/2)-12;var obbx=$('mbox');obbx.style.top=(tp<0?0:tp)+p;obbx.style.left=(lt<0?0:lt)+p;obbx.style.width=wd+p;obbx.style.height=ht+p;inf(h);obbx.style.display=b;return false;}
-        function hm(){var v='visible';var n='none';$('ol').style.display=n;$('mbox').style.display=n;inf(v);document.onkeypress=''}
+        <link rel="stylesheet" href="<c:url value='/includes/bootstrap/3.3.7/css/bootstrap.min.css'/>" />
 
-        function initmb(){var ab='absolute';var n='none';var obody=document.getElementsByTagName('body')[0];var frag=document.createDocumentFragment();var obol=document.createElement('div');obol.setAttribute('id','ol');obol.style.display=n;obol.style.position=ab;obol.style.top=0;obol.style.left=0;obol.style.zIndex=998;obol.style.width='100%';frag.appendChild(obol);var obbx=document.createElement('div');obbx.setAttribute('id','mbox');obbx.style.display=n;obbx.style.position=ab;obbx.style.zIndex=999;var obl=document.createElement('span');obbx.appendChild(obl);var obbxd=document.createElement('div');obbxd.setAttribute('id','mbd');obl.appendChild(obbxd);frag.insertBefore(obbx,obol.nextSibling);obody.insertBefore(frag,obody.firstChild);
-            window.onscroll = scrollFix; window.onresize = sizeFix;
-        }
-    </script>
+        <script src="<c:url value='/includes/bootstrap/3.3.7/js/jquery.min.js'/>"></script>
+        <script src="<c:url value='/includes/bootstrap/3.3.7/js/bootstrap.min.js'/>"></script>
 
-</head>
+        <%--<script src="../../../includes/global_functions_javascript.js"></script>--%>
+        <%--<script src="../../../includes/Tabs.js"></script>--%>
+        <%--<script src="../../../includes/CalendarPopup.js"></script>--%>
+        <%--<script src="../../../includes/repetition-model/repetition-model.js"></script>--%>
+        <%--<script src="../../../includes/prototype.js"></script>--%>
+        <%--<script src="../../../includes/scriptaculous.js?load=effects"></script>--%>
+        <%--<script src="../../../includes/effects.js"></script>--%>
+        <%--<!-- Added for the new Calender -->--%>
+        <%--<link rel="stylesheet" type="text/css" media="all" href="../../../includes/new_cal/skins/aqua/theme.css" title="Aqua" />--%>
+        <%--<script src="../../../includes/new_cal/calendar.js"></script>--%>
+        <%--<!--  fix for issue 14427 Removed the mapping with wrong file name calendar_en.js-->--%>
+        <%--<script src="../../../includes/new_cal/lang/calendar-en.js"></script>--%>
+        <%--<script src="../../../includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>--%>
+        <%--<script src="../../../includes/new_cal/calendar-setup.js"></script>--%>
+        <%--<!-- End -->--%>
+    </head>
 
-<body class="main_BG" topmargin="0" leftmargin="0" marginwidth="0" marginheight="0"
-    <c:if test="${(study.status.locked || study.status.frozen)}">
-        <c:if test="${userBean.numVisitsToMainMenu<=1 || studyJustChanged=='yes'}">
-            onload="initmb();sm('box', 730,100);"
-         </c:if>
-      </c:if>
-    <jsp:include page="../include/showPopUp.jsp"/>
->
+    <body>
+        <%--整体页面的container--%>
+        <div class="container">
 
-<table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%" class="background">
-    <tr>
-        <td valign="top">
-<!-- Header Table -->
-<script language="JavaScript">
-	var StatusBoxValue=1;
-	</script>
-
-<SCRIPT LANGUAGE="JavaScript">
-
-document.write('<table border="0" cellpadding="0" cellspacing="0" width="' + document.body.clientWidth + '" class="header">');
-
-</script>
-            <tr>
-                <td valign="top">
-
-<!-- Logo -->
-
-    <div class="logo"><img src="images/Logo.gif"></div>
-
-<!-- Main Navigation -->
-
-    <jsp:include page="../include/navBar.jsp"/>
-<!-- End Main Navigation -->
+            <%--整个home-header.jsp核心部分--%>
+            <div class="row clearfix">
+                <div class="col-lg-12 column">
+                    <%--整个header--%>
+                    <div class="row">
+                        <%--LOGO--%>
+                        <div class="col-lg-2 column">
+                            <img src="../../../images/seubadge130.jpg" class="img-responsive" alt="logo">
+                        </div>
+                        <%--导航栏--%>
+                        <div class="col-lg-10 column">
+                            <!--navBar.jsp-->
+                            <jsp:include page="navBar.jsp"/>
+                            <!--end of navBar.jsp-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <%--end of 整个home-header.jsp核心部分--%>

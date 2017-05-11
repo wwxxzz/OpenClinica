@@ -1,35 +1,26 @@
 package org.akaza.openclinica.web.restful;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-
+import com.sun.jersey.api.view.Viewable;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import net.sf.json.xml.XMLSerializer;
-
 import org.akaza.openclinica.bean.extract.odm.FullReportBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.sun.jersey.api.view.Viewable;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 
 /***
  * * Rest service for ODM clinical data usage
@@ -80,7 +71,7 @@ public class ODMClinicaDataResource {
 	}
 
 	/**
-	 * @api {get} /rest/clinicaldata/json/view/:study/:subject/:event/:form Retrieve case report forms - JSON
+	 * @api {get} 0/rest/clinicaldata/json/view/:study/:subject/:event/:form Retrieve case report forms - JSON
 	 * @apiVersion 3.8.0
 	 * @apiName getODMClinicaldataJSON
 	 * @apiGroup Subject
@@ -137,39 +128,16 @@ public class ODMClinicaDataResource {
 		return json.toString(INDENT_LEVEL);
 	}
 
-	/**
-	 * @api {get} /rest/clinicaldata/html/print/:study/:subject/:event/:form Retrieve case report forms - HTML
-	 * @apiVersion 3.8.0
-	 * @apiName getPrintCRFController
-	 * @apiGroup Subject
-	 * @apiPermission user
-	 *
-	 * @apiDescription Annotated case report forms in printable HTML format. Use asterisks in place of OIDs as wildcards
-	 *
-	 * @apiParam {String} study Study or Site OID.
-	 * @apiParam {String} subject Subject Key or ID.
-	 * @apiParam {String} event Study Event Definition OID. Use '*' for all.
-	 * @apiParam {String} form Case Report Form Version OID. Use '*' for all.
-	 *
-	 *
-	 * @apiError NoAccessRight Only authenticated users can access the data.
-	 * @apiError NotFound   The resource was not found.
-	 *
-	 * @apiErrorExample Response (example):
-	 *     HTTP/1.1 401 Not Authenticated
-	 *     {
-	 *       "error": "NoAccessRight"
-	 *     }
-	 */
+	//*************************************************
 	@GET
 	@Path("/html/print/{studyOID}/{studySubjectIdentifier}/{eventOID}/{formVersionOID}")
 	public Viewable getPrintCRFController(@Context HttpServletRequest request,
-			@Context HttpServletResponse response,
-			@PathParam("studyOID") String studyOID,
-			@PathParam("studySubjectIdentifier") String studySubjectIdentifier,
-			@PathParam("eventOID") String eventOID,
-			@PathParam("formVersionOID") String formVersionOID,	@DefaultValue("n") @QueryParam("includeDNs") String includeDns,
-			@DefaultValue("n") @QueryParam("includeAudits") String includeAudits)
+										  @Context HttpServletResponse response,
+										  @PathParam("studyOID") String studyOID,
+										  @PathParam("studySubjectIdentifier") String studySubjectIdentifier,
+										  @PathParam("eventOID") String eventOID,
+										  @PathParam("formVersionOID") String formVersionOID,	@DefaultValue("n") @QueryParam("includeDNs") String includeDns,
+										  @DefaultValue("n") @QueryParam("includeAudits") String includeAudits)
 			throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		request.setAttribute("studyOID", studyOID);
@@ -180,6 +148,54 @@ public class ODMClinicaDataResource {
 		request.setAttribute("includeDNs", includeDns);
 		return new Viewable("/WEB-INF/jsp/printcrf.jsp", null);
 	}
+
+	//*************************************************
+	/**
+     * @aouthr:clover-add
+     * print the the personal crf with filled data
+     *
+     *
+     * */
+	@GET
+	@Path("/html/print/{studyOID}/{studySubjectIdentifier}/all")
+	public Viewable getPrintCRFController(@Context HttpServletRequest request,
+			@Context HttpServletResponse response,
+			@PathParam("studyOID") String studyOID,
+			@PathParam("studySubjectIdentifier") String studySubjectIdentifier,
+		   @DefaultValue("n") @QueryParam("includeDNs") String includeDns,
+			@DefaultValue("n") @QueryParam("includeAudits") String includeAudits)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		request.setAttribute("studyOID", studyOID);
+		request.setAttribute("studySubjectOID", getStudySubjectOID(studySubjectIdentifier,studyOID));
+		request.setAttribute("eventype","all");
+		request.setAttribute("includeAudits", includeAudits);
+		request.setAttribute("includeDNs", includeDns);
+		return new Viewable("/WEB-INF/jsp/printcrf.jsp", null);
+	}
+
+    /**
+     * @aouthr:clover-add
+     * print the the personal crf with filled data
+     *
+     *
+     * */
+    @GET
+    @Path("/html/print/{studyOID}/download")
+    public Viewable downloadCRFController(@Context HttpServletRequest request,
+                                          @Context HttpServletResponse response,
+                                          @PathParam("studyOID") String studyOID,
+                                          @DefaultValue("n") @QueryParam("includeDNs") String includeDns,
+                                          @DefaultValue("n") @QueryParam("includeAudits") String includeAudits)
+            throws Exception {
+        request.setCharacterEncoding("UTF-8");
+        request.setAttribute("studyOID", studyOID);
+		request.setAttribute("studySubjectOID", '*');
+        request.setAttribute("eventype","download");
+        request.setAttribute("includeAudits", includeAudits);
+        request.setAttribute("includeDNs", includeDns);
+        return new Viewable("/WEB-INF/jsp/printcrf.jsp", null);
+    }
 
 
 	/**

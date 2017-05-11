@@ -42,8 +42,9 @@ public class SubmitDataServlet extends SecureController {
     public static boolean mayViewData(UserAccountBean ub, StudyUserRoleBean currentRole) {
         if (currentRole != null) {
             Role r = currentRole.getRole();
+            //clover-add(readonly)
             if (r != null && (r.equals(Role.COORDINATOR) || r.equals(Role.STUDYDIRECTOR) ||
-                    r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT) || r.equals(Role.RESEARCHASSISTANT2) ||r.equals(Role.MONITOR) )) {
+                    r.equals(Role.INVESTIGATOR) || r.equals(Role.RESEARCHASSISTANT) || r.equals(Role.RESEARCHASSISTANT2) ||r.equals(Role.MONITOR) ||r.equals(Role.READYONLY) )) {
                 return true;
             }
         }

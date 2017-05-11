@@ -1,3 +1,4 @@
+<%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ page import="org.akaza.openclinica.i18n.util.ResourceBundleProvider" %>
@@ -6,336 +7,696 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
-<script language="JavaScript">
-        /*function reportBug() {
-            var bugtrack = "https://www.openclinica.com/OpenClinica/bug.php?version=<fmt:message key="version_number" bundle="${resword}"/>&user=";
-            var user= "<c:out value="${userBean.name}"/>";
-            bugtrack = bugtrack + user+ "&url=" + window.location.href;
-            openDocWindow(bugtrack);
-        }*/
-        function confirmCancel(pageName){
-            var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
-            if(confirm1){
-                window.location = pageName;
-            }
-        }
-        function confirmExit(pageName){
-            var confirm1 = confirm('<fmt:message key="sure_to_exit" bundle="${resword}"/>');
-            if(confirm1){
-                window.location = pageName;
-            }
-        }
-        function goBack(){
-            var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
-            if(confirm1){
-                return history.go(-1);
-            }
-        }
-        function lockedCRFAlert(userName){
-            alert('<fmt:message key="CRF_unavailable" bundle="${resword}"/>'+'\n'
-                    +'          '+userName+' '+'<fmt:message key="Currently_entering_data" bundle="${resword}"/>'+'\n'
-                    +'<fmt:message key="Leave_the_CRF" bundle="${resword}"/>');
-            return false;
-        }
-        function confirmCancelAction( pageName, contextPath){
-            var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
-            if(confirm1){
-            	 var tform = document.forms["fr_cancel_button"];
-            	tform.action=contextPath+"/"+pageName;
-            	tform.submit();
+<%--
+    该页面为导航栏,包含上两行和navbar
+    from home-header.jsp
+    FY 2017-4-8
+--%>
 
-            }
+<script>
+    function confirmCancel(pageName){
+        var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
+        if(confirm1){
+            window.location = pageName;
         }
-        function confirmExitAction( pageName, contextPath){
-            var confirm1 = confirm('<fmt:message key="sure_to_exit" bundle="${resword}"/>');
-            if(confirm1){
-            	 var tform = document.forms["fr_cancel_button"];
-            	tform.action=contextPath+"/"+pageName;
-            	tform.submit();
-
-            }
+    }
+    function confirmExit(pageName){
+        var confirm1 = confirm('<fmt:message key="sure_to_exit" bundle="${resword}"/>');
+        if(confirm1){
+            window.location = pageName;
         }
+    }
+    function goBack(){
+        var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
+        if(confirm1){
+            return history.go(-1);
+        }
+    }
+    function lockedCRFAlert(userName){
+        alert('<fmt:message key="CRF_unavailable" bundle="${resword}"/>'+'\n'
+                +'          '+userName+' '+'<fmt:message key="Currently_entering_data" bundle="${resword}"/>'+'\n'
+                +'<fmt:message key="Leave_the_CRF" bundle="${resword}"/>');
+        return false;
+    }
+    function confirmCancelAction( pageName, contextPath){
+        var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
+        if(confirm1){
+            var tform = document.forms["fr_cancel_button"];
+            tform.action=contextPath+"/"+pageName;
+            tform.submit();
+        }
+    }
+    function confirmExitAction( pageName, contextPath){
+        var confirm1 = confirm('<fmt:message key="sure_to_exit" bundle="${resword}"/>');
+        if(confirm1){
+            var tform = document.forms["fr_cancel_button"];
+            tform.action=contextPath+"/"+pageName;
+            tform.submit();
+        }
+    }
 </script>
-
 
 <jsp:useBean scope='session' id='tableFacadeRestore' class='java.lang.String' />
 <c:set var="restore" value="true"/>
-<c:if test="${tableFacadeRestore=='false'}"><c:set var="restore" value="false"/></c:if>
+<c:if test="${tableFacadeRestore=='false'}">
+    <c:set var="restore" value="false"/>
+</c:if>
 <c:set var="profilePage" value="${param.profilePage}"/>
-<!--  If Controller Spring based append ../ to urls -->
+<%--  If Controller Spring based append ../ to urls --%>
 <c:set var="urlPrefix" value=""/>
 <c:set var="requestFromSpringController" value="${param.isSpringController}" />
 <c:if test="${requestFromSpringController == 'true' }">
-      <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
+    <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
 </c:if>
 
-<!-- Main Navigation -->
-     <div class="oc_nav">
-        <div id="StudyInfo">
-            <c:choose>
-                <c:when test='${study.parentStudyId > 0}'>
-                    <b><a href="${urlPrefix}ViewStudy?id=${study.parentStudyId}&viewFull=yes" title="<c:out value='${study.parentStudyName}'/>" alt="<c:out value='${study.parentStudyName}'/>" ><c:out value="${study.abbreviatedParentStudyName}" /></a>
-                    :&nbsp;<a href="${urlPrefix}ViewSite?id=${study.id}" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
-                </c:when>
-                <c:otherwise>
-                    <b><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
-                </c:otherwise>
-            </c:choose>
-            (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;|&nbsp;&nbsp;
-            <a href="${urlPrefix}ChangeStudy"><fmt:message key="change_study_site" bundle="${resworkflow}"/></a>
-        </div>
-        <div id="UserInfo">
-            <a href="${urlPrefix}UpdateProfile"><b><c:out value="${userBean.name}" /></b> (<c:out value="${userRole.role.description}" />)&nbsp;
-				<c:out value="<%=ResourceBundleProvider.getLocale().toString()%>"/>
-            </a>&nbsp;|&nbsp;
-            <a href="${urlPrefix}j_spring_security_logout"><fmt:message key="log_out" bundle="${resword}"/></a>
-        </div>
-        <br/><br style="line-height: 4px;"/>
-        <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
-            <div class="navbox_center">
-                <!-- Top Navigation Row -->
-                <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                    <tr>
-                        <td>
-                            <div id="bt_Home" class="nav_bt"><div><div><div>
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                                <tr>
-                                    <td>
-                                        <ul>
-                                        <c:if test="${userRole.coordinator || userRole.director}">
-                                            <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <li><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                        </c:if>
-                                        <c:if test="${userRole.researchAssistant ||userRole.researchAssistant2}">
-                                            <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <c:if test="${study.status.available}">
-                                                <li><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            </c:if>
-                                            <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                        </c:if>
-                                        <c:if test="${userRole.investigator}">
-                                            <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <c:if test="${study.status.available}">
-                                                <li><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            </c:if>
-                                            <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                        </c:if>
-                                        <c:if test="${userRole.monitor }">
-                                            <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <li><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_sdv" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                        </c:if>
-                                        <li id="nav_Tasks" style="position: relative; z-index: 3;">
-                                            <a href="#" onmouseover="setNav('nav_Tasks');" id="nav_Tasks_link"><fmt:message key="nav_tasks" bundle="${resword}"/>
-                                                <img src="${urlPrefix}images/bt_Tasks_pulldown.gif" alt="Tasks" border="0"/></a>
-                                        </li>
-                                        </ul>
-                                    </td>
-                                    <td align="right" style="font-weight: normal;">
-
-                                        <form METHOD="GET" action="${urlPrefix}ListStudySubjects" onSubmit=" if (document.forms[0]['findSubjects_f_studySubject.label'].value == '<fmt:message key="study_subject_ID" bundle="${resword}"/>') { document.forms[0]['findSubjects_f_studySubject.label'].value=''}">
-                                            <!--<a href="javascript:reportBug()"><fmt:message key="openclinica_report_issue" bundle="${resword}"/></a>&nbsp;|&nbsp;-->
-                                            <a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback" bundle="${resword}"/></a>&nbsp;&nbsp;
-                                            <input type="text" name="findSubjects_f_studySubject.label" onblur="if (this.value == '') this.value = '<fmt:message key="study_subject_ID" bundle="${resword}"/>'" onfocus="if (this.value == '<fmt:message key="study_subject_ID" bundle="${resword}"/>') this.value = ''" value="<fmt:message key="study_subject_ID" bundle="${resword}"/>" class="navSearch"/>
-                                            <input type="hidden" name="navBar" value="yes"/>
-                                            <input type="submit" value="<fmt:message key="go" bundle="${resword}"/>"  class="navSearchButton"/>
-                                        </form>
-
-                                    </td>
-                                </tr>
-                            </table>
-                            </div></div></div></div>
-                        </td>
-                    </tr>
-                                    </table>
+<div class="row">
+    <%--study info--%>
+    <c:choose>
+        <c:when test='${study.parentStudyId > 0}'>
+            <div class="col-lg-4 column">
+                <ul class="nav nav-tabs" style="border:none;">
+                    <li>
+                        <a href="${urlPrefix}ViewStudy?id=${study.parentStudyId}&viewFull=yes" title="<c:out value='${study.parentStudyName}'/>" >
+                            <b>
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                <c:out value="${study.abbreviatedParentStudyName}" />
+                            </b>
+                        </a>
+                    </li>
+                </ul>
             </div>
-            <!-- End shaded box border DIVs -->
-        </div></div></div></div></div></div></div></div></div>
-
-
-            </td>
-        </tr>
-    </table>
-    <!-- NAVIGATION DROP-DOWN -->
-
-
-<div id="nav_hide" style="position: absolute; left: 0px; top: 0px; visibility: hidden; z-index: 2; width: 100%; height: 400px;">
-
-<a href="#" onmouseover="hideSubnavs();"><img src="${urlPrefix}images/spacer.gif" alt="" width="1000" height="400" border="0"/></a>
+            <div class="col-lg-4 column">
+                <ul class="nav nav-tabs" style="border:none;">
+                    <li>
+                        <a href="${urlPrefix}ViewSite?id=${study.id}" title="<c:out value='${study.name}'/>" >
+                            <b>
+                                <c:out value="${study.abbreviatedName}" />
+                            </b>
+                            (<c:out value="${study.abbreviatedIdentifier}" />)
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-4 column">
+                <ul class="nav nav-tabs" style="border:none;">
+                    <li>
+                        <a href="${urlPrefix}ChangeStudy">
+                            <span class="glyphicon glyphicon-map-marker"></span>
+                            <fmt:message key="change_study_site" bundle="${resworkflow}"/>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </c:when>
+        <c:otherwise>
+            <div class="col-lg-6 column">
+                <ul class="nav nav-tabs" style="border:none;">
+                    <li>
+                        <a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes" title="<c:out value='${study.name}'/>" >
+                            <b>
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                <c:out value="${study.abbreviatedName}" />
+                            </b>
+                            (<c:out value="${study.abbreviatedIdentifier}" />)
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-6 column">
+                <ul class="nav nav-tabs" style="border:none;">
+                    <li>
+                        <a href="${urlPrefix}ChangeStudy">
+                            <span class="glyphicon glyphicon-map-marker"></span>
+                            <fmt:message key="change_study_site" bundle="${resworkflow}"/>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </c:otherwise>
+    </c:choose>
+    <%--end of study info--%>
 </div>
 
+<div class="row">
+    <%--user info--%>
+    <div class="col-lg-6 column">
+        <ul class="nav nav-tabs" style="border:none;margin-bottom: 10px;">
+            <li>
+                <a href="${urlPrefix}UpdateProfile">
+                    <span class="glyphicon glyphicon-user"></span>
+                    <b><c:out value="${userBean.name}" /></b>
+                    (<c:out value="${userRole.role.description}" />)
+                    <c:out value="<%=ResourceBundleProvider.getLocale().toString()%>"/>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="col-lg-6 column">
+        <ul class="nav nav-tabs" style="border:none;margin-bottom: 10px;">
+            <li>
+                <a href="${urlPrefix}j_spring_security_logout">
+                    <span class="glyphicon glyphicon-log-out"></span>
+                    <fmt:message key="log_out" bundle="${resword}"/>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <%--end of user info--%>
+</div>
 
-    </div>
-    <img src="${urlPrefix}images/spacer.gif" width="596" height="1"><br>
-<!-- End Main Navigation -->
-<div id="subnav_Tasks" class="dropdown">
-    <div class="dropdown_BG">
-        <c:if test="${userRole.monitor }">
-        <div class="taskGroup"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></div>
-        <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
-            <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
-            <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_source_data_verification" bundle="${resword}"/></a></div>
+<div class="row">
+    <%--start of navbar--%>
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#example-navbar-collapse">
+                    <span class="sr-only">ToggleNav</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+
+            <div class="collapse navbar-collapse" id="example-navbar-collapse">
+
+                <%--start of navpills,不同角色的navpills不同--%>
+                <ul class="nav navbar-nav">
+                    <c:if test="${userRole.readonly }">
+                        <li><a href="${urlPrefix}MainMenu"><span class="glyphicon glyphicon-home"></span>&nbsp;<fmt:message key="nav_home" bundle="${resword}"/></a></li>
+                        <li><a href="${urlPrefix}ListStudySubjects"><span class="glyphicon glyphicon-th-large"></span>&nbsp;<fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></li>
+                        <li><a href="${urlPrefix}ViewNotes?module=submit"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;<fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></li>
+                        <li><a href="${urlPrefix}StudyAuditLog"><span class="glyphicon glyphicon-list"></span>&nbsp;<fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></li>
+                    </c:if>
+                    <c:if test="${userRole.coordinator || userRole.director}">
+                        <li><a href="${urlPrefix}MainMenu"><span class="glyphicon glyphicon-home"></span>&nbsp;<fmt:message key="nav_home" bundle="${resword}"/></a></li>
+                        <li><a href="${urlPrefix}ListStudySubjects"><span class="glyphicon glyphicon-th-large"></span>&nbsp;<fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></li>
+                        <li><a href="${urlPrefix}ViewNotes?module=submit"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;<fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></li>
+                        <li><a href="${urlPrefix}StudyAuditLog"><span class="glyphicon glyphicon-list"></span>&nbsp;<fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></li>
+                    </c:if>
+                    <c:if test="${userRole.researchAssistant ||userRole.researchAssistant2}">
+                        <li><a href="${urlPrefix}MainMenu"><span class="glyphicon glyphicon-home"></span>&nbsp;<fmt:message key="nav_home" bundle="${resword}"/></a></li>
+                        <li><a href="${urlPrefix}ListStudySubjects"><span class="glyphicon glyphicon-th-large"></span>&nbsp;<fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></li>
+                        <c:if test="${study.status.available}">
+                            <li><a href="${urlPrefix}AddNewSubject"><span class="glyphicon glyphicon-plus-sign"></span>&nbsp;<fmt:message key="nav_add_subject" bundle="${resword}"/></a></li>
+                        </c:if>
+                        <li><a href="${urlPrefix}ViewNotes?module=submit"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;<fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></li>
+                    </c:if>
+                    <c:if test="${userRole.investigator}">
+                        <li><a href="${urlPrefix}MainMenu"><span class="glyphicon glyphicon-home"></span>&nbsp;<fmt:message key="nav_home" bundle="${resword}"/></a></li>
+                        <li><a href="${urlPrefix}ListStudySubjects"><span class="glyphicon glyphicon-th-large"></span>&nbsp;<fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></li>
+                        <c:if test="${study.status.available}">
+                            <li><a href="${urlPrefix}AddNewSubject"><span class="glyphicon glyphicon-plus-sign"></span>&nbsp;<fmt:message key="nav_add_subject" bundle="${resword}"/></a></li>
+                        </c:if>
+                        <li><a href="${urlPrefix}ViewNotes?module=submit"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;<fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></li>
+                    </c:if>
+                    <c:if test="${userRole.monitor }">
+                        <li><a href="${urlPrefix}MainMenu"><span class="glyphicon glyphicon-home"></span>&nbsp;<fmt:message key="nav_home" bundle="${resword}"/></a></li>
+                        <li><a href="${urlPrefix}ListStudySubjects"><span class="glyphicon glyphicon-th-large"></span>&nbsp;<fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></li>
+                        <li><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><span class="glyphicon glyphicon-ok"></span>&nbsp;<fmt:message key="nav_sdv" bundle="${resword}"/></a></li>
+                        <li><a href="${urlPrefix}ViewNotes?module=submit"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;<fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></li>
+                    </c:if>
+
+                    <%--dropdown,任务菜单--%>
+                    <li class="dropdown">
+
+                        <%--下拉菜单按钮--%>
+                        <%--<button type="button" class="btn btn-primary navbar-btn dropdown-toggle" data-toggle="dropdown">--%>
+                        <%--<fmt:message key="nav_tasks" bundle="${resword}"/><span class="caret"></span>--%>
+                        <%--</button>--%>
+                        <%--end of 下拉菜单按钮--%>
+
+                        <%--模态框按钮--%>
+                        <button type="button" class="btn btn-primary navbar-btn" data-toggle="modal" data-target="#taskModal">
+                            <span class="glyphicon glyphicon-tasks"></span>&nbsp;
+                            <fmt:message key="nav_tasks" bundle="${resword}"/>
+                        </button>
+                        <%--end of 模态框按钮--%>
+
+                        <%--模态框--%>
+                        <div class="modal fade" id="taskModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                            &times;
+                                        </button>
+                                        <h3 class="modal-title text-primary" id="taskModalLabel" align="center">
+                                            Control Panel - <fmt:message key="nav_tasks" bundle="${resword}"/>
+                                        </h3>
+                                    </div>
+                                    <div class="modal-body">
+
+                                        <%--根据userRole生成不同任务按钮--%>
+                                        <div class="row">
+                                            <c:if test="${userRole.readonly}">
+                                                <div class="col-lg-6 column" style="text-align: center;">
+                                                    <%--section1--%>
+                                                    <h4 class="text-center text-primary"><fmt:message key="nav_submit_data" bundle="${resword}"/></h4>
+                                                    <div class="btn-group-vertical" style="display: inline-block;">
+                                                        <a href="${urlPrefix}ListStudySubjects" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-th-large"></span>&nbsp;<fmt:message key="nav_subject_matrix" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}ViewNotes?module=submit" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-question-sign"></span>&nbsp;<fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}ViewStudyEvents" type="button" class="btn btn-default">
+                                                            <fmt:message key="nav_view_events" bundle="${resword}"/>
+                                                        </a>
+                                                    </div>
+                                                    <%--section3--%>
+                                                    <h4 class="text-center text-primary"><fmt:message key="nav_extract_data" bundle="${resword}"/></h4>
+                                                    <div class="btn-group-vertical" style="display: inline-block;">
+                                                        <a href="${urlPrefix}ViewDatasets" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;<fmt:message key="nav_view_datasets" bundle="${resword}"/>
+                                                        </a>
+                                                    </div>
+                                                    <%--section4--%>
+                                                    <h4 class="text-center text-primary"><fmt:message key="nav_study_setup" bundle="${resword}"/></h4>
+                                                    <div class="btn-group-vertical" style="display: inline-block;">
+                                                        <a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-zoom-in"></span>&nbsp;<fmt:message key="nav_view_study" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}ListStudyUser" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-wrench"></span>&nbsp;<fmt:message key="nav_users" bundle="${resword}"/>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 column" style="text-align: center;">
+                                                    <%--section2--%>
+                                                    <h4 class="text-center text-primary"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></h4>
+                                                    <div class="btn-group-vertical" style="display: inline-block;">
+                                                        <a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-ok"></span>&nbsp;<fmt:message key="nav_source_data_verification" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}StudyAuditLog" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-list"></span>&nbsp;<fmt:message key="nav_study_audit_log" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}ViewRuleAssignment?read=true" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-book"></span>&nbsp;<fmt:message key="nav_rules" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}ListSubjectGroupClass?read=true" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-transfer"></span>&nbsp;<fmt:message key="nav_groups" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}ListCRF?module=manage" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-duplicate"></span>&nbsp;<fmt:message key="nav_crfs" bundle="${resword}"/>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </c:if>
+                                            <c:if test="${userRole.monitor }">
+                                                <div class="col-lg-6 column" style="text-align: center;">
+                                                        <%--section1--%>
+                                                    <h4 class="text-center text-primary"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></h4>
+                                                    <div class="btn-group-vertical" style="display: inline-block;">
+                                                        <a href="${urlPrefix}ListStudySubjects" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-th-large"></span>&nbsp;<fmt:message key="nav_subject_matrix" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}ViewStudyEvents" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-calendar"></span>&nbsp;<fmt:message key="nav_view_events" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-ok"></span>&nbsp;<fmt:message key="nav_source_data_verification" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}ViewNotes?module=submit" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-question-sign"></span>&nbsp;<fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}StudyAuditLog" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-list"></span>&nbsp;<fmt:message key="nav_study_audit_log" bundle="${resword}"/>
+                                                        </a>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-6 column" style="text-align: center;">
+                                                        <%--section2--%>
+                                                    <h4 class="text-center text-primary"><fmt:message key="nav_extract_data" bundle="${resword}"/></h4>
+                                                    <div class="btn-group-vertical" style="display: inline-block;">
+                                                        <a href="${urlPrefix}ViewDatasets" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;<fmt:message key="nav_view_datasets" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}CreateDataset" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-file"></span>&nbsp;<fmt:message key="nav_create_dataset" bundle="${resword}"/>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </c:if>
+                                            <c:if test="${userRole.researchAssistant ||userRole.researchAssistant2  }">
+                                                <div class="col-lg-6 column" style="text-align: center;">
+                                                        <%--section1--%>
+                                                    <h4 class="text-center text-primary"><fmt:message key="nav_submit_data" bundle="${resword}"/></h4>
+                                                    <div class="btn-group-vertical" style="display: inline-block;">
+                                                        <a href="${urlPrefix}ListStudySubjects" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-th-large"></span>&nbsp;<fmt:message key="nav_subject_matrix" bundle="${resword}"/>
+                                                        </a>
+                                                        <c:if test="${study.status.available}">
+                                                            <a href="${urlPrefix}AddNewSubject" type="button" class="btn btn-default">
+                                                                <span class="glyphicon glyphicon-plus-sign"></span>&nbsp;<fmt:message key="nav_add_subject" bundle="${resword}"/>
+                                                            </a>
+                                                        </c:if>
+                                                        <a href="${urlPrefix}ViewNotes?module=submit" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-question-sign"></span>&nbsp;<fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/>
+                                                        </a>
+                                                        <c:if test="${!study.status.frozen && !study.status.locked}">
+                                                            <a href="${urlPrefix}CreateNewStudyEvent" type="button" class="btn btn-default">
+                                                                <fmt:message key="nav_schedule_event" bundle="${resword}"/>
+                                                            </a>
+                                                        </c:if>
+                                                        <a href="${urlPrefix}ViewStudyEvents" type="button" class="btn btn-default">
+                                                            <fmt:message key="nav_view_events" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}ImportCRFData" type="button" class="btn btn-default">
+                                                            <fmt:message key="nav_import_data" bundle="${resword}"/>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </c:if>
+                                            <c:if test="${userRole.investigator}">
+                                                <div class="col-lg-6 column" style="text-align: center;">
+                                                        <%--section1--%>
+                                                    <h4 class="text-center text-primary"><fmt:message key="nav_submit_data" bundle="${resword}"/></h4>
+                                                    <div class="btn-group-vertical" style="display: inline-block;">
+                                                        <a href="${urlPrefix}ListStudySubjects" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-th-large"></span>&nbsp;<fmt:message key="nav_subject_matrix" bundle="${resword}"/>
+                                                        </a>
+                                                        <c:if test="${study.status.available}">
+                                                            <a href="${urlPrefix}AddNewSubject" type="button" class="btn btn-default">
+                                                                <span class="glyphicon glyphicon-plus-sign"></span>&nbsp;<fmt:message key="nav_add_subject" bundle="${resword}"/>
+                                                            </a>
+                                                        </c:if>
+                                                        <a href="${urlPrefix}ViewNotes?module=submit" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-question-sign"></span>&nbsp;<fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/>
+                                                        </a>
+                                                        <c:if test="${!study.status.frozen && !study.status.locked}">
+                                                            <a href="${urlPrefix}CreateNewStudyEvent" type="button" class="btn btn-default">
+                                                                <span class="glyphicon glyphicon-paperclip"></span>&nbsp;<fmt:message key="nav_schedule_event" bundle="${resword}"/>
+                                                            </a>
+                                                        </c:if>
+                                                        <a href="${urlPrefix}ViewStudyEvents" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-calendar"></span>&nbsp;<fmt:message key="nav_view_events" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}ImportCRFData" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-log-in"></span>&nbsp;<fmt:message key="nav_import_data" bundle="${resword}"/>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 column" style="text-align: center;">
+                                                        <%--section2--%>
+                                                    <h4 class="text-center text-primary"><fmt:message key="nav_extract_data" bundle="${resword}"/></h4>
+                                                    <div class="btn-group-vertical" style="display: inline-block;">
+                                                        <a href="${urlPrefix}ViewDatasets" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;<fmt:message key="nav_view_datasets" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}CreateDataset" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-file"></span>&nbsp;<fmt:message key="nav_create_dataset" bundle="${resword}"/>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </c:if>
+                                            <c:if test="${userRole.coordinator || userRole.director}">
+                                                <div class="col-lg-6 column" style="text-align: center;">
+                                                        <%--section1--%>
+                                                    <h4 class="text-center text-primary"><fmt:message key="nav_submit_data" bundle="${resword}"/></h4>
+                                                    <div class="btn-group-vertical" style="display: inline-block;">
+                                                        <a href="${urlPrefix}ListStudySubjects" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-th-large"></span>&nbsp;<fmt:message key="nav_subject_matrix" bundle="${resword}"/>
+                                                        </a>
+                                                        <c:if test="${study.status.available}">
+                                                            <a href="${urlPrefix}AddNewSubject" type="button" class="btn btn-default">
+                                                                <span class="glyphicon glyphicon-plus-sign"></span>&nbsp;<fmt:message key="nav_add_subject" bundle="${resword}"/>
+                                                            </a>
+                                                        </c:if>
+                                                        <a href="${urlPrefix}ViewNotes?module=submit" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-question-sign"></span>&nbsp;<fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/>
+                                                        </a>
+                                                        <c:if test="${!study.status.frozen && !study.status.locked}">
+                                                            <a href="${urlPrefix}CreateNewStudyEvent" type="button" class="btn btn-default">
+                                                                <span class="glyphicon glyphicon-paperclip"></span>&nbsp;<fmt:message key="nav_schedule_event" bundle="${resword}"/>
+                                                            </a>
+                                                        </c:if>
+                                                        <a href="${urlPrefix}ViewStudyEvents" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-calendar"></span>&nbsp;<fmt:message key="nav_view_events" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}ImportCRFData" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-log-in"></span>&nbsp;<fmt:message key="nav_import_data" bundle="${resword}"/>
+                                                        </a>
+                                                    </div>
+                                                        <%--section3--%>
+                                                    <h4 class="text-center text-primary"><fmt:message key="nav_extract_data" bundle="${resword}"/></h4>
+                                                    <div class="btn-group-vertical" style="display: inline-block;">
+                                                        <a href="${urlPrefix}ViewDatasets" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;<fmt:message key="nav_view_datasets" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}CreateDataset" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-file"></span>&nbsp;<fmt:message key="nav_create_dataset" bundle="${resword}"/>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 column" style="text-align: center;">
+                                                        <%--section2--%>
+                                                    <h4 class="text-center text-primary"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></h4>
+                                                    <div class="btn-group-vertical" style="display: inline-block;">
+                                                        <a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-ok"></span>&nbsp;<fmt:message key="nav_source_data_verification" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}StudyAuditLog" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-list"></span>&nbsp;<fmt:message key="nav_study_audit_log" bundle="${resword}"/>
+                                                        </a>
+                                                        <c:choose>
+                                                            <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <a href="${urlPrefix}ViewRuleAssignment?read=true" type="button" class="btn btn-default">
+                                                                    <span class="glyphicon glyphicon-book"></span>&nbsp;<fmt:message key="nav_rules" bundle="${resword}"/>
+                                                                </a>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                        <c:choose>
+                                                            <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <a href="${urlPrefix}ListSubjectGroupClass?read=true" type="button" class="btn btn-default">
+                                                                    <span class="glyphicon glyphicon-transfer"></span>&nbsp;<fmt:message key="nav_groups" bundle="${resword}"/>
+                                                                </a>
+                                                                <a href="${urlPrefix}ListCRF?module=manage" type="button" class="btn btn-default">
+                                                                    <span class="glyphicon glyphicon-duplicate"></span>&nbsp;<fmt:message key="nav_crfs" bundle="${resword}"/>
+                                                                </a>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </div>
+                                                        <%--section4--%>
+                                                    <h4 class="text-center text-primary"><fmt:message key="nav_study_setup" bundle="${resword}"/></h4>
+                                                    <div class="btn-group-vertical" style="display: inline-block;">
+                                                        <a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-zoom-in"></span>&nbsp;<fmt:message key="nav_view_study" bundle="${resword}"/>
+                                                        </a>
+                                                        <c:choose>
+                                                            <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <a href="${urlPrefix}pages/studymodule" type="button" class="btn btn-default">
+                                                                    <span class="glyphicon glyphicon-cog"></span>&nbsp;<fmt:message key="nav_build_study" bundle="${resword}"/>
+                                                                </a>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                        <a href="${urlPrefix}ListStudyUser" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-wrench"></span>&nbsp;<fmt:message key="nav_users" bundle="${resword}"/>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </c:if>
+                                        </div>
+                                        <%--end of 根据userRole生成不同按钮--%>
+
+                                        <%--每个userRole都有的两个按钮--%>
+                                        <div class="row">
+                                            <div class="col-lg-6 column" style="text-align: center;">
+                                                <%--section others--%>
+                                                <h4 class="text-center text-primary"><fmt:message key="nav_other" bundle="${resword}"/></h4>
+                                                <div class="btn-group-vertical" style="display: inline-block;">
+                                                    <a href="${urlPrefix}UpdateProfile" type="button" class="btn btn-default">
+                                                        <span class="glyphicon glyphicon-user"></span>&nbsp;<fmt:message key="nav_update_profile" bundle="${resword}"/>
+                                                    </a>
+                                                    <a href="${urlPrefix}j_spring_security_logout" type="button" class="btn btn-default">
+                                                        <span class="glyphicon glyphicon-log-out"></span>&nbsp;<fmt:message key="nav_log_out" bundle="${resword}"/>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <%--根据userBean生成的按钮--%>
+                                            <c:if test="${userBean.sysAdmin || userBean.techAdmin}">
+                                                <div class="col-lg-6 column" style="text-align: center;">
+                                                        <%--section1--%>
+                                                    <h4 class="text-center text-primary"><fmt:message key="nav_administration" bundle="${resword}"/></h4>
+                                                    <div class="btn-group-vertical" style="display: inline-block;">
+                                                        <a href="${urlPrefix}ListStudy" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-screenshot"></span>&nbsp;<fmt:message key="nav_studies" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}ListUserAccounts" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-share-alt"></span>&nbsp;<fmt:message key="nav_users" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}ListCRF?module=admin" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-duplicate"></span>&nbsp;<fmt:message key="nav_crfs" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}ViewAllJobs" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-object-align-vertical"></span>&nbsp;<fmt:message key="nav_jobs" bundle="${resword}"/>
+                                                        </a>
+                                                        <a href="${urlPrefix}ListSubject" type="button" class="btn btn-default">
+                                                            <span class="glyphicon glyphicon-king"></span>&nbsp;<fmt:message key="nav_subjects" bundle="${resword}"/>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </c:if>
+                                            <%--end of 根据userBean生成的按钮--%>
+                                        </div>
+                                        <%--end of 每个userRole都有的两个按钮--%>
+
+                                    </div><%-- /.modal-body --%>
+                                </div><%-- /.modal-content --%>
+                            </div><%-- /.modal dialog--%>
+                        </div>
+                        <%--end of 模态框--%>
+
+                        <%--下拉菜单--%>
+                        <ul class="dropdown-menu">
+                            <%--不同角色的任务下拉菜单不同--%>
+                            <c:if test="${userRole.monitor }">
+                                <%--section1--%>
+                                <li class="dropdown-header"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></li>
+                                <li><a href="${urlPrefix}ListStudySubjects"><span class="glyphicon glyphicon-th-large"></span>&nbsp;<fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></li>
+                                <li><a href="${urlPrefix}ViewStudyEvents"><span class="glyphicon glyphicon-calendar"></span>&nbsp;<fmt:message key="nav_view_events" bundle="${resword}"/></a></li>
+                                <li><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><span class="glyphicon glyphicon-ok"></span>&nbsp;<fmt:message key="nav_source_data_verification" bundle="${resword}"/></a></li>
+                                <li><a href="${urlPrefix}ViewNotes?module=submit"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;<fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></li>
+                                <li><a href="${urlPrefix}StudyAuditLog"><span class="glyphicon glyphicon-list"></span>&nbsp;<fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></li>
+                                <li class="divider"></li>
+                                <%--section2--%>
+                                <li class="dropdown-header"><fmt:message key="nav_extract_data" bundle="${resword}"/></li>
+                                <li><a href="${urlPrefix}ViewDatasets"><span class="glyphicon glyphicon-eye-open"></span>&nbsp;<fmt:message key="nav_view_datasets" bundle="${resword}"/></a></li>
+                                <li><a href="${urlPrefix}CreateDataset"><span class="glyphicon glyphicon-file"></span>&nbsp;<fmt:message key="nav_create_dataset" bundle="${resword}"/></a></li>
+                            </c:if>
+
+                            <c:if test="${userRole.researchAssistant ||userRole.researchAssistant2  }">
+                                <%--section1--%>
+                                <li class="dropdown-header"><fmt:message key="nav_submit_data" bundle="${resword}"/></li>
+                                <li><a href="${urlPrefix}ListStudySubjects"><span class="glyphicon glyphicon-th-large"></span>&nbsp;<fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></li>
+                                <c:if test="${study.status.available}">
+                                    <li><a href="${urlPrefix}AddNewSubject"><span class="glyphicon glyphicon-plus-sign"></span>&nbsp;<fmt:message key="nav_add_subject" bundle="${resword}"/></a></li>
+                                </c:if>
+                                <li><a href="${urlPrefix}ViewNotes?module=submit"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;<fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></li>
+                                <c:if test="${!study.status.frozen && !study.status.locked}">
+                                    <li><a href="${urlPrefix}CreateNewStudyEvent"><fmt:message key="nav_schedule_event" bundle="${resword}"/></a></li>
+                                </c:if>
+                                <li><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></li>
+                                <li><a href="${urlPrefix}ImportCRFData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></li>
+                            </c:if>
+
+                            <c:if test="${userRole.investigator}">
+                                <%--section1--%>
+                                <li class="dropdown-header"><fmt:message key="nav_submit_data" bundle="${resword}"/></li>
+                                <li><a href="${urlPrefix}ListStudySubjects"><span class="glyphicon glyphicon-th-large"></span>&nbsp;<fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></li>
+                                <c:if test="${study.status.available}">
+                                    <li><a href="${urlPrefix}AddNewSubject"><span class="glyphicon glyphicon-plus-sign"></span>&nbsp;<fmt:message key="nav_add_subject" bundle="${resword}"/></a></li>
+                                </c:if>
+                                <li><a href="${urlPrefix}ViewNotes?module=submit"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;<fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></li>
+                                <c:if test="${!study.status.frozen && !study.status.locked}">
+                                    <li><a href="${urlPrefix}CreateNewStudyEvent"><span class="glyphicon glyphicon-paperclip"></span>&nbsp;<fmt:message key="nav_schedule_event" bundle="${resword}"/></a></li>
+                                </c:if>
+                                <li><a href="${urlPrefix}ViewStudyEvents"><span class="glyphicon glyphicon-calendar"></span>&nbsp;<fmt:message key="nav_view_events" bundle="${resword}"/></a></li>
+                                <li><a href="${urlPrefix}ImportCRFData"><span class="glyphicon glyphicon-log-in"></span>&nbsp;<fmt:message key="nav_import_data" bundle="${resword}"/></a></li>
+                                <li class="divider"></li>
+                                <%--section2--%>
+                                <li class="dropdown-header"><fmt:message key="nav_extract_data" bundle="${resword}"/></li>
+                                <li><a href="${urlPrefix}ViewDatasets"><span class="glyphicon glyphicon-eye-open"></span>&nbsp;<fmt:message key="nav_view_datasets" bundle="${resword}"/></a></li>
+                                <li><a href="${urlPrefix}CreateDataset"><span class="glyphicon glyphicon-file"></span>&nbsp;<fmt:message key="nav_create_dataset" bundle="${resword}"/></a></li>
+                            </c:if>
+
+                            <c:if test="${userRole.coordinator || userRole.director}">
+                                <%--section1--%>
+                                <li class="dropdown-header"><fmt:message key="nav_submit_data" bundle="${resword}"/></li>
+                                <li><a href="${urlPrefix}ListStudySubjects"><span class="glyphicon glyphicon-th-large"></span>&nbsp;<fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></li>
+                                <c:if test="${study.status.available}">
+                                    <li><a href="${urlPrefix}AddNewSubject"><span class="glyphicon glyphicon-plus-sign"></span>&nbsp;<fmt:message key="nav_add_subject" bundle="${resword}"/></a></li>
+                                </c:if>
+                                <li><a href="${urlPrefix}ViewNotes?module=submit"><span class="glyphicon glyphicon-question-sign"></span>&nbsp;<fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></li>
+                                <c:if test="${!study.status.frozen && !study.status.locked}">
+                                    <li><a href="${urlPrefix}CreateNewStudyEvent"><span class="glyphicon glyphicon-paperclip"></span>&nbsp;<fmt:message key="nav_schedule_event" bundle="${resword}"/></a></li>
+                                </c:if>
+                                <li><a href="${urlPrefix}ViewStudyEvents"><span class="glyphicon glyphicon-calendar"></span>&nbsp;<fmt:message key="nav_view_events" bundle="${resword}"/></a></li>
+                                <li><a href="${urlPrefix}ImportCRFData"><span class="glyphicon glyphicon-log-in"></span>&nbsp;<fmt:message key="nav_import_data" bundle="${resword}"/></a></li>
+                                <li class="divider"></li>
+                                <%--section2--%>
+                                <li class="dropdown-header"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></li>
+                                <li><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><span class="glyphicon glyphicon-ok"></span>&nbsp;<fmt:message key="nav_source_data_verification" bundle="${resword}"/></a></li>
+                                <li><a href="${urlPrefix}StudyAuditLog"><span class="glyphicon glyphicon-list"></span>&nbsp;<fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></li>
+                                <c:choose>
+                                    <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
+                                    </c:when>
+                                    <c:otherwise>
+                                        <li><a href="${urlPrefix}ViewRuleAssignment?read=true"><span class="glyphicon glyphicon-book"></span>&nbsp;<fmt:message key="nav_rules" bundle="${resword}"/></a></li>
+                                    </c:otherwise>
+                                </c:choose>
+                                <c:choose>
+                                    <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
+                                    </c:when>
+                                    <c:otherwise>
+                                        <li><a href="${urlPrefix}ListSubjectGroupClass?read=true"><span class="glyphicon glyphicon-transfer"></span>&nbsp;<fmt:message key="nav_groups" bundle="${resword}"/></a></li>
+                                        <li><a href="${urlPrefix}ListCRF?module=manage"><span class="glyphicon glyphicon-duplicate"></span>&nbsp;<fmt:message key="nav_crfs" bundle="${resword}"/></a></li>
+                                    </c:otherwise>
+                                </c:choose>
+                                <li class="divider"></li>
+                                <%--section3--%>
+                                <li class="dropdown-header"><fmt:message key="nav_extract_data" bundle="${resword}"/></li>
+                                <li><a href="${urlPrefix}ViewDatasets"><span class="glyphicon glyphicon-eye-open"></span>&nbsp;<fmt:message key="nav_view_datasets" bundle="${resword}"/></a></li>
+                                <li><a href="${urlPrefix}CreateDataset"><span class="glyphicon glyphicon-file"></span>&nbsp;<fmt:message key="nav_create_dataset" bundle="${resword}"/></a></li>
+                                <li class="divider"></li>
+                                <%--section4--%>
+                                <li class="dropdown-header"><fmt:message key="nav_study_setup" bundle="${resword}"/></li>
+                                <li><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes"><span class="glyphicon glyphicon-zoom-in"></span>&nbsp;<fmt:message key="nav_view_study" bundle="${resword}"/></a></li>
+                                <c:choose>
+                                    <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
+                                    </c:when>
+                                    <c:otherwise>
+                                        <li><a href="${urlPrefix}pages/studymodule"><span class="glyphicon glyphicon-cog"></span>&nbsp;<fmt:message key="nav_build_study" bundle="${resword}"/></a></li>
+                                    </c:otherwise>
+                                </c:choose>
+                                <li><a href="${urlPrefix}ListStudyUser"><span class="glyphicon glyphicon-wrench"></span>&nbsp;<fmt:message key="nav_users" bundle="${resword}"/></a></li>
+                                <li class="divider"></li>
+                            </c:if>
+
+                            <c:if test="${userBean.sysAdmin || userBean.techAdmin}">
+                                <%--section1--%>
+                                <li class="dropdown-header"><fmt:message key="nav_administration" bundle="${resword}"/></li>
+                                <li><a href="${urlPrefix}ListStudy"><span class="glyphicon glyphicon-screenshot"></span>&nbsp;<fmt:message key="nav_studies" bundle="${resword}"/></a></li>
+                                <li><a href="${urlPrefix}ListUserAccounts"><span class="glyphicon glyphicon-share-alt"></span>&nbsp;<fmt:message key="nav_users" bundle="${resword}"/></a></li>
+                                <li><a href="${urlPrefix}ListCRF?module=admin"><span class="glyphicon glyphicon-duplicate"></span>&nbsp;<fmt:message key="nav_crfs" bundle="${resword}"/></a></li>
+                                <li><a href="${urlPrefix}ViewAllJobs"><span class="glyphicon glyphicon-object-align-vertical"></span>&nbsp;<fmt:message key="nav_jobs" bundle="${resword}"/></a></li>
+                                <li><a href="${urlPrefix}ListSubject"><span class="glyphicon glyphicon-king"></span>&nbsp;<fmt:message key="nav_subjects" bundle="${resword}"/></a></li>
+                                <li class="divider"></li>
+                            </c:if>
+
+                            <%--section others--%>
+                            <li class="dropdown-header"><fmt:message key="nav_other" bundle="${resword}"/></li>
+                            <li><a href="${urlPrefix}UpdateProfile"><span class="glyphicon glyphicon-user"></span>&nbsp;<fmt:message key="nav_update_profile" bundle="${resword}"/></a></li>
+                            <li><a href="${urlPrefix}j_spring_security_logout"><span class="glyphicon glyphicon-log-out"></span>&nbsp;<fmt:message key="nav_log_out" bundle="${resword}"/></a></li>
+                        </ul>
+                        <%--end of 下拉菜单--%>
+                    </li>
+                    <%--end of dropdown, task section--%>
+                </ul>
+                <%--end of navpills--%>
+
+                <%--start of search--%>
+                <div>
+                    <form class="navbar-form navbar-right" role="search" METHOD="GET" action="${urlPrefix}ListStudySubjects">
+                        <div class="form-group">
+                            <input type="text" name="findSubjects_f_studySubject.label" class="form-control" placeholder="Search Subject ID">
+                        </div>
+                        <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-search"></span></button>
+                    </form>
+                </div>
+                <%--end of search--%>
+
+            </div>
+
         </div>
-        <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></div>
-            <div class="taskLink"><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></div>
-        </div>
-        <br clear="all">
-        <div class="taskGroup"><fmt:message key="nav_extract_data" bundle="${resword}"/></div>
-        <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
-        </div>
-        <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
-        </div>
-        <br clear="all">
-        </c:if>
-        <c:if test="${userRole.researchAssistant ||userRole.researchAssistant2  }">
-        <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
-        <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
-            <c:if test="${study.status.available}">
-                <div class="taskLink"><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
-            </c:if>
-            <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></div>
-        </div>
-        <div class="taskRightColumn">
-            <c:if test="${!study.status.frozen && !study.status.locked}">
-                <div class="taskLink"><a href="${urlPrefix}CreateNewStudyEvent"><fmt:message key="nav_schedule_event" bundle="${resword}"/></a></div>
-            </c:if>
-            <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
-            <div class="taskLink"><a href="${urlPrefix}ImportCRFData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></div>
-        </div>
-        <br clear="all">
-        </c:if>
-        <c:if test="${userRole.investigator}">
-        <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
-        <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
-            <c:if test="${study.status.available}">
-                <div class="taskLink"><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
-            </c:if>
-            <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></div>
-        </div>
-        <div class="taskRightColumn">
-            <c:if test="${!study.status.frozen && !study.status.locked}">
-                <div class="taskLink"><a href="${urlPrefix}CreateNewStudyEvent"><fmt:message key="nav_schedule_event" bundle="${resword}"/></a></div>
-            </c:if>
-            <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
-            <div class="taskLink"><a href="${urlPrefix}ImportCRFData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></div>
-        </div>
-        <br clear="all">
-        <div class="taskGroup"><fmt:message key="nav_extract_data" bundle="${resword}"/></div>
-        <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
-        </div>
-        <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
-        </div>
-        <br clear="all">
-        </c:if>
-        <c:if test="${userRole.coordinator || userRole.director}">
-        <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
-        <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
-            <c:if test="${study.status.available}">
-                <div class="taskLink"><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
-            </c:if>
-            <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a></div>
-        </div>
-        <div class="taskRightColumn">
-            <c:if test="${!study.status.frozen && !study.status.locked}">
-                <div class="taskLink"><a href="${urlPrefix}CreateNewStudyEvent"><fmt:message key="nav_schedule_event" bundle="${resword}"/></a></div>
-            </c:if>
-            <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
-            <div class="taskLink"><a href="${urlPrefix}ImportCRFData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></div>
-        </div>
-        <br clear="all">
-        <div class="taskGroup"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></div>
-        <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_source_data_verification" bundle="${resword}"/></a></div>
-            <div class="taskLink"><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></div>
-            <c:choose>
-                <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
-                </c:when>
-                <c:otherwise>
-                    <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment?read=true"><fmt:message key="nav_rules" bundle="${resword}"/></a></div>
-                </c:otherwise>
-            </c:choose>
-        </div>
-        <div class="taskRightColumn">
-        <c:choose>
-            <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
-            </c:when>
-            <c:otherwise>
-                <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
-                <div class="taskLink"><a href="${urlPrefix}ListCRF?module=manage"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
-            </c:otherwise>
-        </c:choose>
-        </div>
-        <br clear="all">
-        <div class="taskGroup"><fmt:message key="nav_extract_data" bundle="${resword}"/></div>
-        <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
-        </div>
-        <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
-        </div>
-        <br clear="all">
-        <div class="taskGroup"><fmt:message key="nav_study_setup" bundle="${resword}"/></div>
-        <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes"><fmt:message key="nav_view_study" bundle="${resword}"/></a></div>
-            <c:choose>
-                <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
-                </c:when>
-                <c:otherwise>
-                    <div class="taskLink"><a href="${urlPrefix}pages/studymodule"><fmt:message key="nav_build_study" bundle="${resword}"/></a></div>
-                    <!-- <div class="taskLink"><a href="${urlPrefix}ListEventDefinition?read=true"><fmt:message key="nav_event_definitions" bundle="${resword}"/></a></div>  -->
-                </c:otherwise>
-            </c:choose>
-        </div>
-        <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}ListStudyUser"><fmt:message key="nav_users" bundle="${resword}"/></a></div>
-            <%--
-            <c:choose>
-                <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
-                </c:when>
-                <c:otherwise>
-                    <div class="taskLink"><a href="${urlPrefix}ListSite?read=true"><fmt:message key="nav_sites" bundle="${resword}"/></a></div>
-                </c:otherwise>
-            </c:choose>
-             --%>
-        </div>
-        <br clear="all">
-        </c:if>
-        <c:if test="${userBean.sysAdmin || userBean.techAdmin}">
-        <div class="taskGroup"><fmt:message key="nav_administration" bundle="${resword}"/></div>
-        <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}ListStudy"><fmt:message key="nav_studies" bundle="${resword}"/></a></div>
-            <div class="taskLink"><a href="${urlPrefix}ListUserAccounts"><fmt:message key="nav_users" bundle="${resword}"/></a></div>
-            <div class="taskLink"><a href="${urlPrefix}ListCRF?module=admin"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
-        </div>
-        <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}ViewAllJobs"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
-            <div class="taskLink"><a href="${urlPrefix}ListSubject"><fmt:message key="nav_subjects" bundle="${resword}"/></a></div>
-        </div>
-        <br clear="all">
-        </c:if>
-        <div class="taskGroup"><fmt:message key="nav_other" bundle="${resword}"/></div>
-        <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}UpdateProfile"><fmt:message key="nav_update_profile" bundle="${resword}"/></a></div>
-        </div>
-        <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}j_spring_security_logout"><fmt:message key="nav_log_out" bundle="${resword}"/></a></div>
-        </div>
-        <br clear="all">
-        <div></div>
-    </div>
+    </nav>
+    <%--end of navbar--%>
 </div>

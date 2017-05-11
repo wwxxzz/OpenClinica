@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.akaza.openclinica.odm:openclinica-odm:2.2">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/akaza/openclinica/odm/openclinica-odm/2.2/openclinica-odm-2.2.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/akaza/openclinica/odm/openclinica-odm/2.2/openclinica-odm-2.2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/akaza/openclinica/odm/openclinica-odm/2.2/openclinica-odm-2.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

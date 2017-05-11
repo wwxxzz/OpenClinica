@@ -57,8 +57,8 @@ public class ListSubjectGroupClassServlet extends SecureController {
         if (ub.isSysAdmin()) {
             return;
         }
-
-        if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
+        //clover-add(r)eadonly
+        if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR) || currentRole.getRole().equals(Role.READYONLY)) {
             return;
         }
 

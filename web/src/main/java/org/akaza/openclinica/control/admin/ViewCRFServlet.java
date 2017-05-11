@@ -6,8 +6,6 @@
  */
 package org.akaza.openclinica.control.admin;
 
-import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -43,6 +41,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
+
 /**
  * @author jxu
  *
@@ -63,7 +63,8 @@ public class ViewCRFServlet extends SecureController {
         if (ub.isSysAdmin()) {
             return;
         }
-        if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
+        //clover-add(readonly)
+        if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR) || currentRole.getRole().equals(Role.READYONLY)) {
             return;
         }
 

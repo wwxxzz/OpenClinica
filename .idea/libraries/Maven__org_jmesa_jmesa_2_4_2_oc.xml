@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.jmesa:jmesa:2.4.2-oc">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jmesa/jmesa/2.4.2-oc/jmesa-2.4.2-oc.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jmesa/jmesa/2.4.2-oc/jmesa-2.4.2-oc-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jmesa/jmesa/2.4.2-oc/jmesa-2.4.2-oc-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

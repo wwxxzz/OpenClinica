@@ -21,9 +21,10 @@ public class Role extends Term {
     public static final Role RESEARCHASSISTANT = new Role(5, "ra", "Data_Entry_Person", null);
     public static final Role MONITOR = new Role(6, "monitor", "Monitor", null);
     public static final Role RESEARCHASSISTANT2 = new Role(7, "ra2", "site_Data_Entry_Person2", null);
-   
-    
-    private static final Role[] members = { ADMIN, COORDINATOR, STUDYDIRECTOR, INVESTIGATOR, MONITOR, RESEARCHASSISTANT,RESEARCHASSISTANT2};
+    //clover-add(read only)
+    public static final Role READYONLY = new Role(8, "readonly", "Read_Only", null);
+
+    private static final Role[] members = { ADMIN, COORDINATOR, STUDYDIRECTOR, INVESTIGATOR, MONITOR, RESEARCHASSISTANT,RESEARCHASSISTANT2, READYONLY};
     public static final List list = Arrays.asList(members);
     
     public static final Map studyRoleMap = new LinkedHashMap();
@@ -33,6 +34,8 @@ public class Role extends Term {
         studyRoleMap.put(4, "Investigator");
         studyRoleMap.put(5, "Data_Entry_Person");
         studyRoleMap.put(6, "Monitor");
+        //clover-add
+        studyRoleMap.put(8, "Read_Only");
            }
 
     public static final Map siteRoleMap = new LinkedHashMap();

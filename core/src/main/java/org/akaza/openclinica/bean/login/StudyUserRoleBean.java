@@ -82,12 +82,13 @@ public class StudyUserRoleBean extends AuditableEntityBean {
      * @param role
      *            The role to set.
      */
-    public void setRole(Role role) {
+    public void  setRole(Role role) {
         this.role = role;
         super.setId(role.getId());
         super.setName(role.getName());
         // roleName=='coordinator' || roleName=='director' || roleName=='ra' ||
         // roleName=='investigator'}
+        //clover-add
         this.canSubmitData =
             this.role == Role.COORDINATOR || this.role == Role.STUDYDIRECTOR || this.role == Role.RESEARCHASSISTANT || this.role == Role.RESEARCHASSISTANT2 || this.role == Role.INVESTIGATOR;
         this.canExtractData = this.role == Role.COORDINATOR || this.role == Role.STUDYDIRECTOR || this.role == Role.INVESTIGATOR;
@@ -261,5 +262,9 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 
     public boolean isDirector() {
         return this.role == Role.STUDYDIRECTOR;
+    }
+    //clover-add(readonly)
+    public boolean isReadonly() {
+        return this.role == Role.READYONLY;
     }
 }

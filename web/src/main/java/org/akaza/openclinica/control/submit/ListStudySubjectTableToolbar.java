@@ -21,15 +21,20 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
     private final ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
     private final ArrayList<StudyGroupClassBean> studyGroupClasses;
     private final boolean addSubjectLinkShow;
+    //add
+    private String studySubjectOid;
     private ResourceBundle reswords = ResourceBundleProvider.getWordsBundle();
 
+    //clover-add(studysubjectoid->add)
     public ListStudySubjectTableToolbar(ArrayList<StudyEventDefinitionBean> studyEventDefinitions, ArrayList<StudyGroupClassBean> studyGroupClasses,
-            boolean addSubjectLinkShow, boolean showMoreLink) {
+            boolean addSubjectLinkShow, boolean showMoreLink, String studySubjectOid) {
         super();
         this.studyEventDefinitions = studyEventDefinitions;
         this.studyGroupClasses = studyGroupClasses;
         this.addSubjectLinkShow = addSubjectLinkShow;
         this.showMoreLink = showMoreLink;
+        //add
+        this.studySubjectOid = studySubjectOid;
     }
 
     @Override
@@ -43,6 +48,8 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
         if (addSubjectLinkShow) {
             addToolbarItem(createAddSubjectItem());
         }
+        //clover-add
+        addToolbarItem(createCustomItem(new downloadSubjectItem()));
     }
 
     private ToolbarItem createCustomItem(AbstractItem item) {
@@ -159,7 +166,48 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
         }
 
     }
+    //clover-add
+    private class downloadSubjectItem extends AbstractItem {
 
+        @Override
+        public String disabled() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public String enabled() {
+            HtmlBuilder html = new HtmlBuilder();
+            //@pgawade 25-June-2012: fix for issue 14427
+            //html.a().href("#").id("addSubject");// onclick(
+            html.a().href("/rest/metadata/html/print/S_" + studySubjectOid).id("download_empty_crf");
+            // "initmb();sm('box', 730,100);"
+            // );
+            html.quote();
+            html.quote().close();
+            //doesn't add to reswords
+            html.nbsp().append("Empty CRF").nbsp().aEnd();
+
+            html.a().href("/rest/metadata/html/print/S_" + studySubjectOid + "/annotation").id("download_annotated_crf");
+            // "initmb();sm('box', 730,100);"
+            // );
+            html.quote();
+            html.quote().close();
+            //doesn't add to reswords
+            html.nbsp().append("Annotated CRF").nbsp().aEnd();
+
+            html.a().href("/rest/clinicaldata/html/print/S_" + studySubjectOid + "/download").id("download_all_crf");
+            // "initmb();sm('box', 730,100);"
+            // );
+            html.quote();
+            html.quote().close();
+            //doesn't add to reswords
+            html.nbsp().append("Download ALL CRF").nbsp().aEnd();
+
+            return html.toString();
+        }
+
+    }
     private static class CustomItemRenderer extends AbstractItemRenderer {
         public CustomItemRenderer(ToolbarItem item, CoreContext coreContext) {
             setToolbarItem(item);

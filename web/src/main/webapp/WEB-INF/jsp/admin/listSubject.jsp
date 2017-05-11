@@ -6,16 +6,26 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 
+<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
+<jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />
+<jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
+
+<%--
+    该页面为管理受试者页面/ListSubject,内含JMESA表格
+    include admin-header.jsp\sideAlert.jsp\sideInfo.jsp\footer.jsp
+    FY 2017-4-8
+--%>
+
+<!--admin-header.jsp-->
 <jsp:include page="../include/admin-header.jsp"/>
+<!--end of admin-header.jsp-->
 
-<link rel="stylesheet" href="includes/jmesa/jmesa.css" type="text/css">
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.1.1.js"></script> 
-
-
-<script type="text/javascript">
+<link rel="stylesheet" href="../../../includes/jmesa/jmesa.css">
+<script src="../../../includes/jmesa/jquery.min.js"></script>
+<script src="../../../includes/jmesa/jquery.jmesa.js"></script>
+<script src="../../../includes/jmesa/jmesa.js"></script>
+<script src="../../../includes/jmesa/jquery-migrate-1.1.1.js"></script>
+<script>
     function onInvokeAction(id,action) {
         if(id.indexOf('listSubjects') == -1)  {
         setExportToLimit(id, '');
@@ -29,42 +39,71 @@
 </script>
 
 
-<!-- move the alert message to the sidebar-->
-<jsp:include page="../include/sideAlert.jsp"/>
-<!-- then instructions-->
-<tr id="sidebar_Instructions_open" style="display: none">
-        <td class="sidebar_tab">
+<%--侧栏和主内容区--%>
+<div class="row clearfix">
+    <%--侧栏--%>
+    <div class="col-lg-2 column">
 
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+        <!--sideAlert-->
+        <jsp:include page="../include/sideAlert.jsp"/>
+        <!--end of sideAlert-->
 
-        <b><fmt:message key="instructions" bundle="${restext}"/></b>
+        <%--instructions--%>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" href="#collapseins">
+                        <fmt:message key="instructions" bundle="${resword}"/>
+                        <span class="glyphicon glyphicon-pushpin pull-right"></span>
+                    </a>
+                </h4>
+            </div>
+            <div id="collapseins" class="panel-collapse collapse">
+                <div class="panel-body">
 
-        <div class="sidebar_tab_content">
+                </div>
+            </div>
+        </div>
+        <%--end of instructions--%>
 
+        <!--sideInfo暂时禁用-->
+        <%--<jsp:include page="../include/sideInfo.jsp"/>--%>
+        <!--end of sideInfo-->
+
+    </div>
+    <%--end of 侧栏--%>
+
+    <%--主内容区--%>
+    <div class="col-lg-10 column">
+
+        <div class="row">
+            <div class="col-lg-12 column">
+                <%--start of jumbotron--%>
+                <div class="jumbotron">
+                    <%--主标题--%>
+                    <h2 class="text-center">
+                        <fmt:message key="administer_subjects" bundle="${resworkflow}"/>
+                    </h2>
+                    <%--end of 主标题--%>
+                </div>
+                <%--end of jumbotron--%>
+            </div>
         </div>
 
-        </td>
+        <%--主体--%>
+        <div class="row">
+            <form  action="${pageContext.request.contextPath}/ListSubject">
+                <input type="hidden" name="module" value="submit">
+                ${listSubjectsHtml}
+            </form>
+        </div>
+        <%--end of 主体--%>
 
-    </tr>
-    <tr id="sidebar_Instructions_closed" style="display: all">
-        <td class="sidebar_tab">
+    </div>
+    <%--end of 主内容区--%>
+</div>
+<%--end of 侧栏与主内容区--%>
 
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
-
-        <b><fmt:message key="instructions" bundle="${restext}"/></b>
-
-        </td>
-  </tr>
-<jsp:include page="../include/sideInfo.jsp"/>
-
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />
-<jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
-<h1><span class="title_manage"><fmt:message key="administer_subjects" bundle="${resworkflow}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/administer-subjects')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
-
-<form  action="${pageContext.request.contextPath}/ListSubject">
-        <input type="hidden" name="module" value="submit">
-        ${listSubjectsHtml}
-    </form>
-
+<!--footer.jsp-->
 <jsp:include page="../include/footer.jsp"/>
+<!--end of footer.jsp-->

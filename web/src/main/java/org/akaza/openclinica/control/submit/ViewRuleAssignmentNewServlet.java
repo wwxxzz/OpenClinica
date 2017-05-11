@@ -32,12 +32,11 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Verify the Rule import , show records that have Errors as well as records that will be saved.
@@ -170,7 +169,8 @@ public class ViewRuleAssignmentNewServlet extends SecureController {
             return;
         }
         Role r = currentRole.getRole();
-       if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
+        //clover-add(readonly)
+       if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.READYONLY)) {
             return;
         }
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));

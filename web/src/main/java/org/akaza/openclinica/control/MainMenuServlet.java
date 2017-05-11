@@ -7,11 +7,6 @@
  */
 package org.akaza.openclinica.control;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.admin.EventStatusStatisticsTableFactory;
@@ -22,14 +17,7 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
@@ -39,6 +27,11 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  *
@@ -192,7 +185,13 @@ System.out.println("is ub a ldapuser??"+ub.isLdapUser());
                 if (currentRole.isInvestigator() || currentRole.isResearchAssistant() || currentRole.isResearchAssistant2()) {
                     setupListStudySubjectTable();
                 }
-                if (currentRole.isMonitor()) {
+                //clover-add(readonly)
+                if(currentRole.isReadonly()){
+                    setupStudySiteStatisticsTable();
+                    setupSubjectEventStatusStatisticsTable();
+                    setupStudySubjectStatusStatisticsTable();
+                    setupStudyStatisticsTable();
+                } else if (currentRole.isMonitor()) {
                     setupSubjectSDVTable();
                 } else if (currentRole.isCoordinator() || currentRole.isDirector()) {
                     if (currentStudy.getStatus().isPending()) {

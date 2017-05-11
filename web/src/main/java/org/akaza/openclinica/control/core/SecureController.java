@@ -523,6 +523,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     case 6:
                         role.setDescription("Monitor");
                         break;
+                        case 8:
+                            role.setDescription("Read_Only");
+                            break;
                     default:
                         // logger.info("No role matched when setting role description");
                     }
